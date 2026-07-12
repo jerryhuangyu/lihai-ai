@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { importViaWorker } from '../../import/importViaWorker'
-import { EXPORT_COMMAND, EXPORT_HINT } from '../../export/exportCommand'
+import { bundleScriptUrl, exportCommand, EXPORT_HINT } from '../../export/exportCommand'
 
 export function ImportPanel() {
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const scriptUrl = bundleScriptUrl()
+  const command = exportCommand(scriptUrl)
 
   async function handle(file: File) {
     setErr(null)
@@ -22,22 +26,36 @@ export function ImportPanel() {
     }
   }
 
+  async function copy() {
+    await navigator.clipboard.writeText(command)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-4">
       <div className="bg-muted/40 rounded-lg border p-4 text-sm">
-        <p className="mb-2 font-medium">第一步：在終端機產生 bundle</p>
-        <ol className="text-muted-foreground mb-3 list-decimal space-y-1 pl-5">
-          <li>
-            <a className="text-primary underline" href="/build-bundle.mjs" download>
-              下載 build-bundle.mjs
-            </a>
-          </li>
-          <li>執行下面指令</li>
-        </ol>
-        <pre className="bg-background overflow-x-auto rounded border p-2 font-mono text-xs">
-          {EXPORT_COMMAND}
-        </pre>
+        <p className="mb-2 font-medium">第一步：在終端機貼上執行</p>
+        <div className="flex items-start gap-2">
+          <pre className="bg-background flex-1 overflow-x-auto rounded border p-2 font-mono text-xs">
+            {command}
+          </pre>
+          <button
+            type="button"
+            onClick={copy}
+            className="hover:bg-muted rounded border px-2 py-1 text-xs whitespace-nowrap"
+          >
+            {copied ? '已複製' : '複製'}
+          </button>
+        </div>
         <p className="text-muted-foreground mt-2 text-xs">{EXPORT_HINT}</p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          沒有 curl？也可{' '}
+          <a className="text-primary underline" href={scriptUrl} download>
+            下載腳本
+          </a>{' '}
+          後手動執行。
+        </p>
       </div>
 
       <label
@@ -51,7 +69,7 @@ export function ImportPanel() {
       >
         <span className="font-medium">第二步：拖拉或選擇 bundle 檔</span>
         <span className="text-muted-foreground text-xs">
-          {busy ? '解析中…' : '~/cc-usage-bundle.json.gz'}
+          {busy ? '解析中…' : '~/lihai-bundle.json.gz'}
         </span>
         <input
           type="file"

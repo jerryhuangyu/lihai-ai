@@ -8,8 +8,7 @@ beforeEach(() => useDataStore.getState().reset())
 
 test('no data → shows import panel', () => {
   render(<RootContent />)
-  // A bare /build-bundle\.mjs/ regex matches the <a>, <pre>, and hint <p> at
-  // once inside ImportPanel (see ImportPanel.dom.test.tsx) — anchor on the
-  // command block's distinguishing "Downloads/" prefix instead.
-  expect(screen.getByText(/Downloads\/build-bundle\.mjs/)).toBeTruthy()
+  // build-bundle.mjs appears in the curl command, the fallback link, and the
+  // hint at once — anchor on the curl|node pipe unique to the command block.
+  expect(screen.getByText(/curl .*build-bundle\.mjs \| node/)).toBeTruthy()
 })

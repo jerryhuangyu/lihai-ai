@@ -1,52 +1,61 @@
-# React + TypeScript + Vite
+# LiHai AI Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+**[中文](README.zh-TW.md)** | **[English](README.md)**
 
-Currently, two official plugins are available:
+Frontend-only AI Usage Dashboard. Turns usage data from agent CLIs (Claude Code / Codex) into an analytics panel in the style of Linear Analytics × Vercel Analytics × GitHub Insights.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live**: <https://jerryhuangyu.github.io/lihai-ai/>
 
-## React Compiler
+**Positioning**: existing OSS (ccgauge, MyCCusage, etc.) all run a local server/daemon that watches `~/.claude`. This project goes the other way — **fully static site, drag-and-drop upload, zero install, no cloud DB**. Your data never leaves your browser.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the Oxlint configuration
+No clone, no install. Open the [live app](https://jerryhuangyu.github.io/lihai-ai/), then:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+1. Paste this one-liner into your terminal (needs `curl` + `node`):
+   ```bash
+   curl -fsSL https://jerryhuangyu.github.io/lihai-ai/build-bundle.mjs | node --input-type=module
+   ```
+   It fetches the generator, runs `ccusage --json` (authoritative cost) and recursively reads `~/.claude/projects/**/*.jsonl` (project, branch, per-message timestamps), then writes a single gzip bundle to `~/lihai-bundle.json.gz`.
+2. Drag `~/lihai-bundle.json.gz` into the app.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+Everything runs locally — the bundle is never uploaded anywhere. (No `curl`? The import panel also offers `build-bundle.mjs` as a plain download.)
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## How it works
 
-## LLM 價目資料（pricing）
+The client gunzips the bundle with fflate, joins cost and events by `sessionId`, and aggregates. Aggregates are stored in localStorage (zustand persist); raw events go to IndexedDB (Dexie).
 
-`src/pricing/rates.json` 是 app 唯一保留的價目表（每個 model、每種 token 類型的 list price，$/1M）。它用來在 ccusage 推導的有效（blended）成本旁邊，顯示真實 list price（output / input / cache-read / cache-creation）。**其餘成本一律以 ccusage 為來源**。
+**Cost comes only from ccusage** — no hand-built pricing table. Per-event cost is derived by distributing the session `totalCost` weighted by tokens (invariant: for every matched session, Σ event cost == session `totalCost`).
 
-資料來源為 [LiteLLM 社群價目 DB](https://github.com/BerriAI/litellm)，由 `scripts/update-prices.mjs` 快照。
+## Pages
 
-手動刷新：
+- `index`: dashboard overview (KPIs + charts)
+- `analysis`: deep analysis and drilldown
+- `sessions`: session list
+
+## Stack
+
+- Vite + React 19 + TypeScript (strict), pnpm
+- Router: TanStack Router (autoCodeSplitting)
+- State: zustand (+persist); raw events: Dexie (IndexedDB); gzip: fflate
+- Charts: ECharts. UI: shadcn/ui + Base UI + Tailwind v4
+- Tests: Vitest (parser / join / aggregate as pure functions, TDD)
+
+## Development
 
 ```bash
-pnpm update-prices
+pnpm install
+pnpm dev            # dev server
+pnpm build          # tsc -b + vite build (use this for type checks, not bare tsc --noEmit)
+pnpm test           # vitest run
+pnpm lint           # oxlint
 ```
 
-刷新後 commit 產生的 diff。
+## Deploy
 
-### 自動刷新
+Every push to `main` triggers `.github/workflows/deploy.yml`, which runs `pnpm build` and publishes to GitHub Pages (served under the `/lihai-ai/` subpath; SPA deep links fall back through `404.html`).
 
-`.github/workflows/update-prices.yml` 於每週一 03:00 UTC 自動執行（亦可在 Actions 頁面手動 `workflow_dispatch`）：跑 `pnpm update-prices`，若 `rates.json` 有變動則自動開一支 `chore/update-prices` PR（無變動則不開）。review 後 squash-merge，merge 進 `main` 才觸發 `deploy.yml` 部署上線。
+## Docs
 
-走 PR 而非直接 commit `main`：保留 review gate；且以預設 `GITHUB_TOKEN` 直接 push `main` 不會觸發其他 workflow（GitHub 防遞迴），改由 merge 這個一般 push 觸發部署。
+- Design spec: `docs/superpowers/specs/2026-07-11-ai-usage-dashboard-design.md`
+- Implementation plan: `docs/superpowers/plans/2026-07-11-data-foundation.md`

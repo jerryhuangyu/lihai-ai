@@ -10,12 +10,11 @@ vi.mock('../../import/importViaWorker', () => ({
 
 beforeEach(() => useDataStore.getState().reset())
 
-test('shows the copy-command block and a download link', () => {
+test('shows the curl one-liner and a no-curl download fallback', () => {
   render(<ImportPanel />)
-  // EXPORT_COMMAND/EXPORT_HINT both repeat "build-bundle.mjs", so a bare
-  // /build-bundle\.mjs/ regex matches the <a>, <pre>, and hint <p> at once —
-  // anchor on the command block's distinguishing "Downloads/" prefix instead.
-  expect(screen.getByText(/Downloads\/build-bundle\.mjs/)).toBeTruthy()
+  // The primary command block is the curl|node pipe — anchor on "curl" so it
+  // doesn't collide with the fallback link / hint that also name the script.
+  expect(screen.getByText(/curl .*build-bundle\.mjs \| node/)).toBeTruthy()
   expect(screen.getByRole('link', { name: /下載/ })).toBeTruthy()
 })
 

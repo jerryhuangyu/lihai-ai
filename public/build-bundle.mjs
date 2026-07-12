@@ -64,6 +64,6 @@ const bundle = {
   sessions,
 }
 
-const out = join(homedir(), 'cc-usage-bundle.json.gz')
+const out = join(homedir(), 'lihai-bundle.json.gz')
 writeFileSync(out, gzipSync(Buffer.from(JSON.stringify(bundle))))
 console.log(`Wrote ${out} (${sessions.length} sessions)`)

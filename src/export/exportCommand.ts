@@ -1,7 +1,19 @@
-/** Command the UI shows next to a "下載 build-bundle.mjs" button. The user
- *  downloads the generator (served as a static asset by the app), then runs it.
- *  It writes ~/cc-usage-bundle.json.gz to drag back into the app. */
-export const EXPORT_COMMAND = 'node ~/Downloads/build-bundle.mjs'
+/** URL of build-bundle.mjs served by this app. Base-path aware: on GitHub
+ *  Pages the app lives under a subpath (/lihai-ai/), so a bare "/build-bundle.mjs"
+ *  would resolve to the domain root and 404. import.meta.env.BASE_URL carries the
+ *  configured base ("/lihai-ai/" in prod, "/" in dev) and always ends with "/". */
+export function bundleScriptUrl(): string {
+  return `${window.location.origin}${import.meta.env.BASE_URL}build-bundle.mjs`
+}
+
+/** The one-line command shown in the import panel. The user pastes it into a
+ *  terminal; it fetches the bundle generator straight from this app's origin and
+ *  pipes it into node — no download, no repo clone. `--input-type=module` because
+ *  the script is ESM and stdin has no package.json for node to infer that from.
+ *  Output: ~/lihai-bundle.json.gz, which the user drags back into the app. */
+export function exportCommand(scriptUrl: string): string {
+  return `curl -fsSL ${scriptUrl} | node --input-type=module`
+}
 
 export const EXPORT_HINT =
-  '1. 下載 build-bundle.mjs　2. 於終端機執行上面指令　3. 產生 ~/cc-usage-bundle.json.gz 後拖進本頁'
+  '指令會在本機讀取你的用量並產生 ~/lihai-bundle.json.gz，資料不會離開你的電腦。'
