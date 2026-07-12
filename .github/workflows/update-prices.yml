@@ -1,0 +1,50 @@
+name: Update LLM prices
+
+on:
+  # 每週一 03:00 UTC 刷新一次；LiteLLM 價目變動不頻繁，週更足夠。
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+# 需要 contents:write 建立 branch、pull-requests:write 開 PR。
+permissions:
+  contents: write
+  pull-requests: write
+
+# 同時只跑一支，避免兩次排程疊在一起。
+concurrency:
+  group: update-prices
+  cancel-in-progress: true
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm update-prices
+
+      # 若 rates.json 有變動則開 PR（無變動時 action 自動 no-op，不建 PR）。
+      # 走 PR 而非直接 commit main：保留 review gate，且 merge 後才觸發 deploy.yml
+      # 上線（直接用 GITHUB_TOKEN push main 不會再觸發其他 workflow）。
+      - name: Open PR with updated prices
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-prices
+          commit-message: 'chore: refresh LLM prices from LiteLLM'
+          title: 'chore: refresh LLM prices from LiteLLM'
+          body: |
+            自動刷新 `src/pricing/rates.json`（來源：LiteLLM 社群價目 DB）。
+
+            由 `.github/workflows/update-prices.yml` 產生。review 後 squash-merge 即上線。
+          add-paths: src/pricing/rates.json
+          delete-branch: true

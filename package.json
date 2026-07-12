@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "update-prices": "node scripts/update-prices.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
