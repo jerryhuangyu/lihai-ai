@@ -2,7 +2,7 @@
 
 **[中文](README.zh-TW.md)** | **[English](README.md)**
 
-Frontend-only AI Usage Dashboard. Turns usage data from agent CLIs (Claude Code / Codex) into an analytics panel in the style of Linear Analytics × Vercel Analytics × GitHub Insights.
+Frontend-only LiHai Usage Dashboard. Turns usage data from agent CLIs (Claude Code / Codex) into an analytics panel in the style of Linear Analytics × Vercel Analytics × GitHub Insights.
 
 **Live**: <https://jerryhuangyu.github.io/lihai-ai/>
 
