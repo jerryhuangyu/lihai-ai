@@ -5,7 +5,9 @@ import './index.css'
 import { routeTree } from './routeTree.gen'
 import { applyTheme, useThemeStore } from './store/useThemeStore'
 
-const router = createRouter({ routeTree })
+// basepath 對齊 Vite base（import.meta.env.BASE_URL = '/lihai-ai/'），
+// 讓 router 在 GitHub Pages 子路徑下正確解析與產生連結。
+const router = createRouter({ routeTree, basepath: import.meta.env.BASE_URL })
 
 declare module '@tanstack/react-router' {
   interface Register { router: typeof router }
