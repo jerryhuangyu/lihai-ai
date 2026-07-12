@@ -3,9 +3,17 @@ import type { ChartTheme } from '../../viz/theme'
 import { categorical } from '../../viz/palette'
 
 type Row = { date: string; model: string; cost: number }
-const MAX_NAMED = 5 // 6th hue reserved for 其他
+const MAX_NAMED = 5 // 6th hue reserved for the "other" fold-in bucket
 
-export function buildModelTimelineOption(rows: Row[], theme: ChartTheme): EChartsOption {
+export interface ModelTimelineLabels {
+  other: string // 超過 MAX_NAMED 個 model 時，折疊進此分類名稱，如「其他」
+}
+
+export function buildModelTimelineOption(
+  rows: Row[],
+  theme: ChartTheme,
+  labels: ModelTimelineLabels,
+): EChartsOption {
   const colors = categorical(theme.theme)
   const dates = [...new Set(rows.map((r) => r.date))].sort()
   const totalByModel = new Map<string, number>()
@@ -14,8 +22,8 @@ export function buildModelTimelineOption(rows: Row[], theme: ChartTheme): EChart
   const named = ranked.slice(0, MAX_NAMED)
   const foldRest = ranked.length > MAX_NAMED
 
-  const label = (m: string) => (named.includes(m) ? m : '其他')
-  const seriesNames = foldRest ? [...named, '其他'] : named
+  const label = (m: string) => (named.includes(m) ? m : labels.other)
+  const seriesNames = foldRest ? [...named, labels.other] : named
 
   const cell = new Map<string, Map<string, number>>() // name -> date -> cost
   for (const name of seriesNames) cell.set(name, new Map())

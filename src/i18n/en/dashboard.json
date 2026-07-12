@@ -1,0 +1,121 @@
+{
+  "common": {
+    "noData": "No data yet",
+    "loading": "Loading…",
+    "listSeparator": ", "
+  },
+  "kpi": {
+    "totalCost": { "label": "Total cost" },
+    "avgPerDay": { "label": "Avg cost per day" },
+    "burnRate": { "label": "Burn rate (per hour)" },
+    "deltaVsYesterday": "{{delta}} vs yesterday",
+    "liveBlock": {
+      "title": "Current 5-hour billing block",
+      "remaining": "About {{minutes}} min remaining",
+      "spent": "Spent {{amount}}",
+      "projected": "Projected total {{amount}}"
+    }
+  },
+  "filter": {
+    "presets": {
+      "last7d": "Last 7 days",
+      "last30d": "Last 30 days",
+      "last90d": "Last 90 days",
+      "all": "All time"
+    }
+  },
+  "overview": {
+    "sections": {
+      "cost": "Cost",
+      "usageComposition": "Usage composition"
+    }
+  },
+  "analysis": {
+    "sections": {
+      "projectAndTime": "Projects & time of day",
+      "efficiencyAndDistribution": "Efficiency & distribution"
+    }
+  },
+  "agentShare": {
+    "title": "Claude vs Codex (cost share by agent)"
+  },
+  "cacheTrend": {
+    "title": "Cache hit rate trend",
+    "series": "Cache hit rate"
+  },
+  "costByTokenType": {
+    "title": "Cost breakdown",
+    "subtitle": "Where your money goes by token type · compare against usage to see that \"more tokens\" isn't \"more cost\"",
+    "footnote": "$ breakdown is estimated: allocated by LiteLLM per-type list price ratio, total still equals actual ccusage cost · Cache read = re-reading existing context (high volume, low unit price) · Pricing updated {{date}}",
+    "rows": {
+      "usage": "Usage",
+      "cost": "Cost"
+    },
+    "series": {
+      "cacheCreation": "Cache write",
+      "cacheRead": "Cache read"
+    }
+  },
+  "dailyCost": {
+    "title": "Daily cost",
+    "series": "Daily cost"
+  },
+  "hourHeatmap": {
+    "title": "Hour-of-day activity heatmap",
+    "subtitle": "Local time",
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "tooltip": {
+      "shareOfTotal": "{{cost}} · {{share}}% of total cost",
+      "daysActive": "Active {{days}} days",
+      "recentDate": "· Latest {{date}}"
+    }
+  },
+  "modelEfficiency": {
+    "title": "Model cost efficiency",
+    "subtitle": "Official list price per model, higher is pricier; hover any row to see your actual average cost",
+    "noPricingData": "No public pricing data yet",
+    "footnote": "List pricing source: LiteLLM · Updated {{date}}",
+    "unpriced": "　·　No public pricing: {{models}}",
+    "tooltip": {
+      "listPrice": "Official output list price {{rate}}/1M{{estimated}}",
+      "estimatedSuffix": " (estimated)",
+      "effectiveRate": "Effective rate {{rate}}/1M token (all tokens)",
+      "outputShare": "Output token share {{pct}}%"
+    }
+  },
+  "modelTimeline": {
+    "title": "Model usage timeline",
+    "other": "Other"
+  },
+  "projectRanking": {
+    "title": "Project cost ranking",
+    "subtitle": "Requires JSONL to attribute cost to projects"
+  },
+  "projection": {
+    "title": "Cost projection",
+    "monthEnd": "Linear projection to month end",
+    "blockProjection": "Current 5h block projected {{amount}}"
+  },
+  "sessionDist": {
+    "title": "Session context distribution",
+    "subtitle": "Total tokens per session",
+    "tooltip": {
+      "sessionCount": "{{n}} session(s)"
+    }
+  },
+  "tokenComposition": {
+    "title": "Token composition",
+    "toggleAbsolute": "Qty",
+    "toggleNormalized": "%",
+    "series": {
+      "cacheCreation": "Cache write",
+      "cacheRead": "Cache read"
+    }
+  },
+  "whyToday": {
+    "title": "Why did today cost so much",
+    "subtitle": "Today vs 7-day average, broken down by model",
+    "vsAvg": "vs 7-day average",
+    "flat": "Today is in line with recent days"
+  }
+}

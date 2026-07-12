@@ -1,0 +1,17 @@
+{
+  "list": {
+    "title": "Session details",
+    "subtitle": "Click a row to see message-level cost for that session",
+    "empty": "No data yet (JSONL required)",
+    "selectPrompt": "Select a session"
+  },
+  "detail": {
+    "loading": "Loading…",
+    "messageCount": "{{count}} message(s)",
+    "cost": "Cost {{amount}}",
+    "tokens": "{{tokens}} tokens",
+    "timeline": {
+      "xAxisName": "Message sequence"
+    }
+  }
+}

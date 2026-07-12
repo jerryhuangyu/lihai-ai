@@ -4,20 +4,31 @@ import { categorical } from '../../viz/palette'
 
 type Row = { date: string; input: number; output: number; cacheCreation: number; cacheRead: number }
 
+export interface TokenCompositionLabels {
+  // 'Input'/'Output' 為技術詞彙，兩語系共用不需翻譯；僅 Cache 系列有中文需參數化。
+  series: { cacheCreation: string; cacheRead: string }
+}
+
 // Fixed semantic order + palette indices (blue, orange, purple, cyan).
-const SERIES: { name: string; key: keyof Omit<Row, 'date'>; idx: number }[] = [
-  { name: 'Input', key: 'input', idx: 0 },
-  { name: 'Output', key: 'output', idx: 1 },
-  { name: 'Cache 建立', key: 'cacheCreation', idx: 2 },
-  { name: 'Cache 讀取', key: 'cacheRead', idx: 5 },
-]
+function buildSeriesMeta(
+  labels: TokenCompositionLabels,
+): { name: string; key: keyof Omit<Row, 'date'>; idx: number }[] {
+  return [
+    { name: 'Input', key: 'input', idx: 0 },
+    { name: 'Output', key: 'output', idx: 1 },
+    { name: labels.series.cacheCreation, key: 'cacheCreation', idx: 2 },
+    { name: labels.series.cacheRead, key: 'cacheRead', idx: 5 },
+  ]
+}
 
 export function buildTokenCompositionOption(
   data: Row[],
   theme: ChartTheme,
-  normalized = false,
+  normalized: boolean,
+  labels: TokenCompositionLabels,
 ): EChartsOption {
   const colors = categorical(theme.theme)
+  const SERIES = buildSeriesMeta(labels)
   // Per-date totals, used to rescale each date's 4 values to sum 100% in normalized mode.
   const totals = data.map((d) => d.input + d.output + d.cacheCreation + d.cacheRead)
   const valueAt = (s: (typeof SERIES)[number], i: number) => {

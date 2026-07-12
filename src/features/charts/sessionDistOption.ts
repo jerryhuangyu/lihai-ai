@@ -1,6 +1,7 @@
 import type { EChartsOption } from 'echarts'
 import type { ChartTheme } from '../../viz/theme'
 import { categorical } from '../../viz/palette'
+import { fillTemplate } from './fillTemplate'
 
 export function bucketize(totals: number[], bins: number): { label: string; count: number; lo: number }[] {
   if (totals.length === 0) return []
@@ -16,9 +17,16 @@ export function bucketize(totals: number[], bins: number): { label: string; coun
   return out
 }
 
+export interface SessionDistLabels {
+  tooltip: {
+    sessionCount: string // {{n}} 樣板字串，如「{{n}} 個 session」
+  }
+}
+
 export function buildSessionDistOption(
   d: { totals: number[]; p50: number; p90: number },
   theme: ChartTheme,
+  labels: SessionDistLabels,
 ): EChartsOption {
   const color = categorical(theme.theme)[2] // purple
   const buckets = bucketize(d.totals, 12)
@@ -27,7 +35,10 @@ export function buildSessionDistOption(
   const p90Bin = Math.min(11, Math.floor(d.p90 / width))
   return {
     grid: { left: 40, right: 16, top: 16, bottom: 28, containLabel: true },
-    tooltip: { trigger: 'axis', valueFormatter: (v) => `${v} 個 session` },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (v) => fillTemplate(labels.tooltip.sessionCount, { n: String(v) }),
+    },
     xAxis: { type: 'category', data: buckets.map((b) => b.label), axisLabel: { color: theme.muted, interval: 1 }, axisLine: { lineStyle: { color: theme.grid } }, name: 'tokens', nameTextStyle: { color: theme.muted } },
     yAxis: { type: 'value', splitLine: { lineStyle: { color: theme.grid } }, axisLabel: { color: theme.muted } },
     series: [

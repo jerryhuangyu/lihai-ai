@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
@@ -6,13 +7,14 @@ import { EmptyState } from '../../ui/EmptyState'
 import { buildAgentShareOption } from './agentShareOption'
 
 export function AgentShareCard() {
+  const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   if (!agg) return null
   return (
-    <Card title="Claude vs Codex（各 agent 成本佔比）">
+    <Card title={t('agentShare.title')}>
       {agg.agentShare.length === 0 ? (
-        <EmptyState>尚無資料</EmptyState>
+        <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
         <EChart option={buildAgentShareOption(agg.agentShare, theme)} style={{ height: 300 }} />
       )}

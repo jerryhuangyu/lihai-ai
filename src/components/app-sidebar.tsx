@@ -1,6 +1,7 @@
 "use client";
 
 import { Link, useMatchRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { navItems } from "@/components/app-shared";
 import { Logo, LogoIcon } from "@/components/logo";
 import {
@@ -15,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function AppSidebar() {
+	const { t } = useTranslation("shell");
 	const matchRoute = useMatchRoute();
 
 	return (
@@ -42,7 +44,7 @@ export function AppSidebar() {
 								render={<Link to={item.to} />}
 							>
 								{item.icon}
-								<span>{item.title}</span>
+								<span>{t(item.titleKey)}</span>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					))}

@@ -1,10 +1,15 @@
 // @vitest-environment jsdom
 import { beforeEach, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import i18n from '@/i18n/config'
 import { useDataStore } from '../store/useDataStore'
 import { RootContent } from './__root'
 
-beforeEach(() => useDataStore.getState().reset())
+beforeEach(async () => {
+  // 斷言前固定語言為 en，避免 jsdom 的 LanguageDetector 結果不穩定造成 CI flaky。
+  await i18n.changeLanguage('en')
+  useDataStore.getState().reset()
+})
 
 test('no data → shows import panel', () => {
   render(<RootContent />)

@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppHeader } from '@/components/app-header'
@@ -12,6 +13,7 @@ import { useDataStore } from '@/store/useDataStore'
 export const Route = createRootRoute({ component: RootLayout })
 
 export function RootContent() {
+  const { t } = useTranslation('shell')
   const hasData = useHasData()
   const coverage = useDataStore((s) => s.coverage)
   const generatedAt = useDataStore((s) => s.generatedAt)
@@ -31,13 +33,13 @@ export function RootContent() {
     <div className="flex flex-col gap-4">
       <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-xs">
         <span>
-          成本歸屬涵蓋率 {covPct}%
-          {generatedAt && ` · 匯出於 ${new Date(generatedAt).toLocaleString()}`}
+          {t('root.costCoverage', { pct: covPct })}
+          {generatedAt && ` · ${t('root.exportedAt', { date: new Date(generatedAt).toLocaleString() })}`}
         </span>
         <div className="flex items-center gap-3">
           <FilterBar />
           <button className="hover:text-foreground underline" onClick={reset}>
-            重新匯入
+            {t('root.reimport')}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { expect, test, beforeEach } from 'vitest'
+import i18n from '@/i18n/config'
 import { LiveBlock } from './LiveBlock'
 import type { CcusageBlock } from '../../domain/types'
 
@@ -11,9 +12,13 @@ const base: CcusageBlock = {
   projection: { remainingMinutes: 0, totalCost: 20, totalTokens: 0 },
 }
 
+beforeEach(async () => {
+  await i18n.changeLanguage('en')
+})
+
 test('renders spend + projection for an active block', () => {
   render(<LiveBlock block={base} />)
-  expect(screen.getByText(/已花/)).toBeTruthy()
+  expect(screen.getByText(/Spent/)).toBeTruthy()
   expect(screen.getByText(/\$12\.50/)).toBeTruthy()
   expect(screen.getByText(/\$20\.00/)).toBeTruthy()
 })

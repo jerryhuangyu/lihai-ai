@@ -3,18 +3,26 @@ import type { ChartTheme } from '../../viz/theme'
 import { categorical } from '../../viz/palette'
 import type { CostByTokenType } from '../../aggregate/analytics'
 
-// yAxis category order (echarts draws category bottom→top): 用量 bottom, 花費 top.
-const ROWS = ['用量', '花費'] as const
+export interface CostByTokenTypeLabels {
+  // yAxis category order (echarts draws category bottom→top): usage bottom, cost top.
+  rows: { usage: string; cost: string }
+  // 'Input'/'Output' 為技術詞彙，兩語系共用不需翻譯；僅 Cache 系列有中文需參數化。
+  series: { cacheCreation: string; cacheRead: string }
+}
 
 // Fixed semantic order + palette indices (blue, orange, purple, cyan), identical
 // to TokenCompositionCard's stack so the same token type reads the same color
 // across cards. Resolved via categorical(theme) so dark mode uses dark-surface hues.
-const SERIES: { name: string; key: keyof CostByTokenType; idx: number }[] = [
-  { name: 'Input', key: 'input', idx: 0 },
-  { name: 'Output', key: 'output', idx: 1 },
-  { name: 'Cache 建立', key: 'cacheCreation', idx: 2 },
-  { name: 'Cache 讀取', key: 'cacheRead', idx: 5 },
-]
+function buildSeriesMeta(
+  labels: CostByTokenTypeLabels,
+): { name: string; key: keyof CostByTokenType; idx: number }[] {
+  return [
+    { name: 'Input', key: 'input', idx: 0 },
+    { name: 'Output', key: 'output', idx: 1 },
+    { name: labels.series.cacheCreation, key: 'cacheCreation', idx: 2 },
+    { name: labels.series.cacheRead, key: 'cacheRead', idx: 5 },
+  ]
+}
 
 function formatTokens(n: number): string {
   if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
@@ -26,8 +34,14 @@ function pct(value: number, total: number): number {
   return total === 0 ? 0 : (value / total) * 100
 }
 
-export function buildCostByTokenTypeOption(data: CostByTokenType, theme: ChartTheme): EChartsOption {
+export function buildCostByTokenTypeOption(
+  data: CostByTokenType,
+  theme: ChartTheme,
+  labels: CostByTokenTypeLabels,
+): EChartsOption {
   const colors = categorical(theme.theme)
+  const SERIES = buildSeriesMeta(labels)
+  const ROWS = [labels.rows.usage, labels.rows.cost]
   const costTotal = SERIES.reduce((a, s) => a + (data[s.key]?.cost ?? 0), 0)
   const tokenTotal = SERIES.reduce((a, s) => a + (data[s.key]?.tokens ?? 0), 0)
 

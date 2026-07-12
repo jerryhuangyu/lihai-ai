@@ -1,0 +1,18 @@
+{
+  "toggleLanguage": "切換語言",
+  "nav": {
+    "overview": "總覽",
+    "analysis": "分析",
+    "sessions": "Session"
+  },
+  "theme": {
+    "system": "主題：跟隨系統",
+    "light": "主題：淺色",
+    "dark": "主題：深色"
+  },
+  "root": {
+    "costCoverage": "成本歸屬涵蓋率 {{pct}}%",
+    "exportedAt": "匯出於 {{date}}",
+    "reimport": "重新匯入"
+  }
+}

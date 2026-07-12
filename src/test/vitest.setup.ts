@@ -1,3 +1,5 @@
+import '../i18n/config'
+
 // Environment shim, not product code.
 //
 // Node 26 ships its own experimental global `localStorage` (see

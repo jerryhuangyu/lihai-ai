@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
@@ -7,6 +8,7 @@ import { outputRate, PRICING_META } from '../../pricing/outputRate'
 import { buildModelEfficiencyOption, type EfficiencyRow } from './modelEfficiencyOption'
 
 export function ModelEfficiencyCard() {
+  const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   if (!agg) return null
@@ -27,15 +29,26 @@ export function ModelEfficiencyCard() {
   const unpriced = enriched.filter((r) => r.listRate === null).map((r) => r.model)
 
   return (
-    <Card title="模型成本效率" subtitle="各模型的官方定價，數字越高越貴；滑過任一列，看你實際的平均花費">
+    <Card title={t('modelEfficiency.title')} subtitle={t('modelEfficiency.subtitle')}>
       {priced.length === 0 ? (
-        <EmptyState>尚無公開定價資料</EmptyState>
+        <EmptyState>{t('modelEfficiency.noPricingData')}</EmptyState>
       ) : (
-        <EChart option={buildModelEfficiencyOption(priced, theme)} style={{ height: 300 }} />
+        <EChart
+          option={buildModelEfficiencyOption(priced, theme, {
+            tooltip: {
+              listPrice: t('modelEfficiency.tooltip.listPrice'),
+              estimatedSuffix: t('modelEfficiency.tooltip.estimatedSuffix'),
+              effectiveRate: t('modelEfficiency.tooltip.effectiveRate'),
+              outputShare: t('modelEfficiency.tooltip.outputShare'),
+            },
+          })}
+          style={{ height: 300 }}
+        />
       )}
       <p className="text-muted-foreground mt-2 text-xs">
-        list 定價來源 LiteLLM · 更新於 {PRICING_META.fetchedAt}
-        {unpriced.length > 0 && `　·　無公開定價：${unpriced.join('、')}`}
+        {t('modelEfficiency.footnote', { date: PRICING_META.fetchedAt })}
+        {unpriced.length > 0 &&
+          t('modelEfficiency.unpriced', { models: unpriced.join(t('common.listSeparator')) })}
       </p>
     </Card>
   )

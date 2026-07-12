@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
@@ -6,15 +7,21 @@ import { EmptyState } from '../../ui/EmptyState'
 import { buildSessionDistOption } from './sessionDistOption'
 
 export function SessionDistCard() {
+  const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   if (!agg) return null
   return (
-    <Card title="Session 上下文分布" subtitle="每個 session 的總 token 量">
+    <Card title={t('sessionDist.title')} subtitle={t('sessionDist.subtitle')}>
       {agg.sessionDistribution.totals.length === 0 ? (
-        <EmptyState>尚無資料</EmptyState>
+        <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
-        <EChart option={buildSessionDistOption(agg.sessionDistribution, theme)} style={{ height: 300 }} />
+        <EChart
+          option={buildSessionDistOption(agg.sessionDistribution, theme, {
+            tooltip: { sessionCount: t('sessionDist.tooltip.sessionCount') },
+          })}
+          style={{ height: 300 }}
+        />
       )}
     </Card>
   )

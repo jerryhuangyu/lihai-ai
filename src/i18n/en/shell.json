@@ -1,0 +1,18 @@
+{
+  "toggleLanguage": "Switch language",
+  "nav": {
+    "overview": "Overview",
+    "analysis": "Analysis",
+    "sessions": "Session"
+  },
+  "theme": {
+    "system": "Theme: follow system",
+    "light": "Theme: light",
+    "dark": "Theme: dark"
+  },
+  "root": {
+    "costCoverage": "Cost attribution coverage {{pct}}%",
+    "exportedAt": "Exported at {{date}}",
+    "reimport": "Re-import data"
+  }
+}

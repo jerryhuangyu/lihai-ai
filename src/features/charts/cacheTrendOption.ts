@@ -4,7 +4,11 @@ import { categorical } from '../../viz/palette'
 
 type Row = { date: string; hitRate: number; cacheReadTokens: number }
 
-export function buildCacheTrendOption(data: Row[], theme: ChartTheme): EChartsOption {
+export interface CacheTrendLabels {
+  series: string // 折線 series 名稱，如「Cache 命中率」
+}
+
+export function buildCacheTrendOption(data: Row[], theme: ChartTheme, labels: CacheTrendLabels): EChartsOption {
   const color = categorical(theme.theme)[5] // cyan = cache identity
   return {
     grid: { left: 48, right: 16, top: 16, bottom: 28 },
@@ -27,7 +31,7 @@ export function buildCacheTrendOption(data: Row[], theme: ChartTheme): EChartsOp
     },
     series: [
       {
-        name: 'Cache 命中率',
+        name: labels.series,
         type: 'line',
         smooth: true,
         showSymbol: false,

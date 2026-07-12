@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
@@ -8,17 +9,18 @@ import { sliceByDate } from '../filter/slice'
 import { buildModelTimelineOption } from './modelTimelineOption'
 
 export function ModelTimelineCard() {
+  const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   const range = useResolvedRange()
   if (!agg) return null
   const data = sliceByDate(agg.modelTimeline, range)
   return (
-    <Card title="Model 使用時間軸">
+    <Card title={t('modelTimeline.title')}>
       {data.length === 0 ? (
-        <EmptyState>尚無資料</EmptyState>
+        <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
-        <EChart option={buildModelTimelineOption(data, theme)} />
+        <EChart option={buildModelTimelineOption(data, theme, { other: t('modelTimeline.other') })} />
       )}
     </Card>
   )

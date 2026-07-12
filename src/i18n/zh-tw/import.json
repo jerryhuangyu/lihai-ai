@@ -1,0 +1,20 @@
+{
+  "step1": {
+    "title": "第一步：在終端機貼上執行",
+    "copy": "複製",
+    "copied": "已複製",
+    "noCurl": "沒有 curl？也可",
+    "downloadScript": "下載腳本",
+    "runManually": "後手動執行。",
+    "hint": "指令會在本機讀取你的用量並產生 ~/lihai-bundle.json.gz，資料不會離開你的電腦。"
+  },
+  "step2": {
+    "title": "第二步：拖拉或選擇 bundle 檔",
+    "parsing": "解析中…",
+    "placeholder": "~/lihai-bundle.json.gz",
+    "uploadLabel": "上傳 bundle"
+  },
+  "error": {
+    "notGz": "請上傳一鍵指令產生的 .gz bundle 檔"
+  }
+}

@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { importViaWorker } from '../../import/importViaWorker'
-import { bundleScriptUrl, exportCommand, EXPORT_HINT } from '../../export/exportCommand'
+import { bundleScriptUrl, exportCommand } from '../../export/exportCommand'
 
 export function ImportPanel() {
+  const { t } = useTranslation('import')
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -13,7 +15,7 @@ export function ImportPanel() {
   async function handle(file: File) {
     setErr(null)
     if (!file.name.endsWith('.gz')) {
-      setErr('請上傳一鍵指令產生的 .gz bundle 檔')
+      setErr(t('error.notGz'))
       return
     }
     setBusy(true)
@@ -35,7 +37,7 @@ export function ImportPanel() {
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-4">
       <div className="bg-muted/40 rounded-lg border p-4 text-sm">
-        <p className="mb-2 font-medium">第一步：在終端機貼上執行</p>
+        <p className="mb-2 font-medium">{t('step1.title')}</p>
         <div className="flex items-start gap-2">
           <pre className="bg-background flex-1 overflow-x-auto rounded border p-2 font-mono text-xs">
             {command}
@@ -45,16 +47,16 @@ export function ImportPanel() {
             onClick={copy}
             className="hover:bg-muted rounded border px-2 py-1 text-xs whitespace-nowrap"
           >
-            {copied ? '已複製' : '複製'}
+            {copied ? t('step1.copied') : t('step1.copy')}
           </button>
         </div>
-        <p className="text-muted-foreground mt-2 text-xs">{EXPORT_HINT}</p>
+        <p className="text-muted-foreground mt-2 text-xs">{t('step1.hint')}</p>
         <p className="text-muted-foreground mt-1 text-xs">
-          沒有 curl？也可{' '}
+          {t('step1.noCurl')}{' '}
           <a className="text-primary underline" href={scriptUrl} download>
-            下載腳本
+            {t('step1.downloadScript')}
           </a>{' '}
-          後手動執行。
+          {t('step1.runManually')}
         </p>
       </div>
 
@@ -67,15 +69,15 @@ export function ImportPanel() {
           if (f) handle(f)
         }}
       >
-        <span className="font-medium">第二步：拖拉或選擇 bundle 檔</span>
+        <span className="font-medium">{t('step2.title')}</span>
         <span className="text-muted-foreground text-xs">
-          {busy ? '解析中…' : '~/lihai-bundle.json.gz'}
+          {busy ? t('step2.parsing') : t('step2.placeholder')}
         </span>
         <input
           type="file"
           accept=".gz"
           className="sr-only"
-          aria-label="上傳 bundle"
+          aria-label={t('step2.uploadLabel')}
           onChange={(e) => e.target.files?.[0] && handle(e.target.files[0])}
         />
       </label>

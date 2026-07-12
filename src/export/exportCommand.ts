@@ -14,6 +14,3 @@ export function bundleScriptUrl(): string {
 export function exportCommand(scriptUrl: string): string {
   return `curl -fsSL ${scriptUrl} | node --input-type=module`
 }
-
-export const EXPORT_HINT =
-  '指令會在本機讀取你的用量並產生 ~/lihai-bundle.json.gz，資料不會離開你的電腦。'

@@ -1,0 +1,17 @@
+{
+  "list": {
+    "title": "Session 明細",
+    "subtitle": "點一列看該 session 的訊息級成本",
+    "empty": "尚無資料（需 JSONL）",
+    "selectPrompt": "選一個 session"
+  },
+  "detail": {
+    "loading": "載入中…",
+    "messageCount": "{{count}} 則訊息",
+    "cost": "成本 {{amount}}",
+    "tokens": "{{tokens}} tokens",
+    "timeline": {
+      "xAxisName": "訊息序"
+    }
+  }
+}

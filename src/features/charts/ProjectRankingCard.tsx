@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Card } from '../../ui/Card'
 import { EmptyState } from '../../ui/EmptyState'
 import { EChart } from '../../viz/EChart'
@@ -6,14 +7,15 @@ import { useFilteredEventCards } from '../filter/useFilteredEventCards'
 import { buildProjectRankingOption } from './projectRankingOption'
 
 export function ProjectRankingCard() {
+  const { t } = useTranslation('dashboard')
   const { projectRanking, loading } = useFilteredEventCards()
   const theme = useChartTheme()
   return (
-    <Card title="專案花費排行" subtitle="需 JSONL 才能歸屬到專案">
+    <Card title={t('projectRanking.title')} subtitle={t('projectRanking.subtitle')}>
       {loading ? (
-        <EmptyState>載入中…</EmptyState>
+        <EmptyState>{t('common.loading')}</EmptyState>
       ) : projectRanking.length === 0 ? (
-        <EmptyState>尚無資料</EmptyState>
+        <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
         <EChart option={buildProjectRankingOption(projectRanking, theme)} style={{ height: 320 }} />
       )}

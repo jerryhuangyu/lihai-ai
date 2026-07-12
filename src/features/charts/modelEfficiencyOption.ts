@@ -1,6 +1,7 @@
 import type { EChartsOption } from 'echarts'
 import type { ChartTheme } from '../../viz/theme'
 import { categorical } from '../../viz/palette'
+import { fillTemplate } from './fillTemplate'
 
 export interface EfficiencyRow {
   model: string
@@ -10,7 +11,21 @@ export interface EfficiencyRow {
   exact: boolean // false = family estimate
 }
 
-export function buildModelEfficiencyOption(rows: EfficiencyRow[], theme: ChartTheme): EChartsOption {
+export interface ModelEfficiencyLabels {
+  tooltip: {
+    // 皆為 {{var}} 樣板字串，由 fillTemplate 於 formatter 內代入實際數值
+    listPrice: string // 例：'官方 output 牌價 {{rate}}/1M{{estimated}}'
+    estimatedSuffix: string // 例：'（估計）'，僅 !exact 時代入 listPrice 的 {{estimated}}
+    effectiveRate: string // 例：'實付均價 {{rate}}/1M token（含全部 token）'
+    outputShare: string // 例：'output token 佔用量 {{pct}}%'
+  }
+}
+
+export function buildModelEfficiencyOption(
+  rows: EfficiencyRow[],
+  theme: ChartTheme,
+  labels: ModelEfficiencyLabels,
+): EChartsOption {
   const color = categorical(theme.theme)[3] // green = efficiency identity
   const ordered = [...rows].reverse() // cheapest list price on top
   return {
@@ -31,9 +46,14 @@ export function buildModelEfficiencyOption(rows: EfficiencyRow[], theme: ChartTh
           `<div style="color:${theme.muted};font-size:12px;line-height:1.7">${s}</div>`
         return (
           `<div style="color:${theme.ink};font-weight:600;font-size:13px;margin-bottom:3px">${r.model}</div>` +
-          sub(`官方 output 牌價 $${r.listRate}/1M${r.exact ? '' : '（估計）'}`) +
-          sub(`實付均價 $${(r.perTokenCost ?? 0).toFixed(2)}/1M token（含全部 token）`) +
-          sub(`output token 佔用量 ${((r.outputShare ?? 0) * 100).toFixed(1)}%`)
+          sub(
+            fillTemplate(labels.tooltip.listPrice, {
+              rate: `$${r.listRate}`,
+              estimated: r.exact ? '' : labels.tooltip.estimatedSuffix,
+            }),
+          ) +
+          sub(fillTemplate(labels.tooltip.effectiveRate, { rate: `$${(r.perTokenCost ?? 0).toFixed(2)}` })) +
+          sub(fillTemplate(labels.tooltip.outputShare, { pct: ((r.outputShare ?? 0) * 100).toFixed(1) }))
         )
       },
     },

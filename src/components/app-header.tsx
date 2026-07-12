@@ -1,15 +1,20 @@
 import { useLocation } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { DecorIcon } from "@/components/decor-icon";
 import { AppBreadcrumbs } from "@/components/app-breadcrumbs";
 import { navItems } from "@/components/app-shared";
 import { CustomSidebarTrigger } from "@/components/custom-sidebar-trigger";
+import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppHeader() {
+	const { t } = useTranslation("shell");
 	const { pathname } = useLocation();
-	const page = navItems.find((item) => (item.to === "/" ? pathname === "/" : pathname.startsWith(item.to))) ?? navItems[0];
+	const activeItem = navItems.find((item) => (item.to === "/" ? pathname === "/" : pathname.startsWith(item.to))) ?? navItems[0];
+	// AppBreadcrumbs 只吃已解析好的顯示字串（title），故在此把 navItems 的翻譯 key 解析成當前語言文字。
+	const page = { title: t(activeItem.titleKey), icon: activeItem.icon };
 
 	return (
 		<header
@@ -28,6 +33,7 @@ export function AppHeader() {
 				<AppBreadcrumbs page={page} />
 			</div>
 			<div className="flex items-center gap-3">
+				<LanguageToggle />
 				<ThemeToggle />
 			</div>
 		</header>

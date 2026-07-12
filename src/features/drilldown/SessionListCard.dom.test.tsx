@@ -2,6 +2,7 @@
 import 'fake-indexeddb/auto'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { expect, test, beforeEach, vi } from 'vitest'
+import i18n from '@/i18n/config'
 import { SessionListCard } from './SessionListCard'
 import { useDataStore } from '../../store/useDataStore'
 import { buildAggregates } from '../../aggregate'
@@ -11,16 +12,17 @@ import { SAMPLE_BUNDLE } from '../../domain/fixtures/bundle.sample'
 // out here to keep this a pure list+selection test.
 vi.mock('../../viz/EChart', () => ({ EChart: () => null }))
 
-beforeEach(() => {
+beforeEach(async () => {
   const { aggregates, coverage } = buildAggregates(SAMPLE_BUNDLE, '2026-07-10')
   useDataStore.getState().setResult({ aggregates, coverage, generatedAt: 'x' })
+  await i18n.changeLanguage('en')
 })
 
 test('lists sessions and selects one on click', () => {
   render(<SessionListCard />)
   const row = screen.getByRole('button', { name: /app/ })
   fireEvent.click(row)
-  expect(screen.getByText(/則訊息|載入中/)).toBeTruthy()
+  expect(screen.getByText(/message\(s\)|Loading/)).toBeTruthy()
 })
 
 test('does not crash on a stale aggregate missing sessionSummaries', () => {
@@ -35,5 +37,5 @@ test('does not crash on a stale aggregate missing sessionSummaries', () => {
     generatedAt: 'x',
   })
   render(<SessionListCard />)
-  expect(screen.getByText(/尚無資料/)).toBeTruthy()
+  expect(screen.getByText(/No data yet/)).toBeTruthy()
 })

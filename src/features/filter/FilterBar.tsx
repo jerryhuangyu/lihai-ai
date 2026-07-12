@@ -1,11 +1,16 @@
+import { useTranslation } from 'react-i18next'
 import { useFilterStore } from './useFilterStore'
 import { resolveRange, type RangePreset } from './range'
 
-const PRESETS: { key: RangePreset; label: string }[] = [
-  { key: '7d', label: '近 7 日' },
-  { key: '30d', label: '近 30 日' },
-  { key: '90d', label: '近 90 日' },
-  { key: 'all', label: '全部' },
+// labelKey 型別固定為既有 i18n key 的字面量聯集，讓 t() 保有型別檢查（非泛用 string）。
+const PRESETS: {
+  key: RangePreset
+  labelKey: 'filter.presets.last7d' | 'filter.presets.last30d' | 'filter.presets.last90d' | 'filter.presets.all'
+}[] = [
+  { key: '7d', labelKey: 'filter.presets.last7d' },
+  { key: '30d', labelKey: 'filter.presets.last30d' },
+  { key: '90d', labelKey: 'filter.presets.last90d' },
+  { key: 'all', labelKey: 'filter.presets.all' },
 ]
 
 export function useResolvedRange() {
@@ -14,6 +19,7 @@ export function useResolvedRange() {
 }
 
 export function FilterBar() {
+  const { t } = useTranslation('dashboard')
   const preset = useFilterStore((s) => s.preset)
   const setPreset = useFilterStore((s) => s.setPreset)
   return (
@@ -27,7 +33,7 @@ export function FilterBar() {
             preset === p.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
           }`}
         >
-          {p.label}
+          {t(p.labelKey)}
         </button>
       ))}
     </div>

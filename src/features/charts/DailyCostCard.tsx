@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
@@ -8,14 +9,19 @@ import { sliceByDate } from '../filter/slice'
 import { buildDailyCostOption } from './dailyCostOption'
 
 export function DailyCostCard() {
+  const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   const range = useResolvedRange()
   if (!agg) return null
   const data = sliceByDate(agg.dailyCost, range)
   return (
-    <Card title="每日成本">
-      {data.length === 0 ? <EmptyState>尚無資料</EmptyState> : <EChart option={buildDailyCostOption(data, theme)} />}
+    <Card title={t('dailyCost.title')}>
+      {data.length === 0 ? (
+        <EmptyState>{t('common.noData')}</EmptyState>
+      ) : (
+        <EChart option={buildDailyCostOption(data, theme, { series: t('dailyCost.series') })} />
+      )}
     </Card>
   )
 }

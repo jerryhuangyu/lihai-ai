@@ -1,0 +1,121 @@
+{
+  "common": {
+    "noData": "尚無資料",
+    "loading": "載入中…",
+    "listSeparator": "、"
+  },
+  "kpi": {
+    "totalCost": { "label": "總花費" },
+    "avgPerDay": { "label": "日均花費" },
+    "burnRate": { "label": "Burn rate（每小時）" },
+    "deltaVsYesterday": "{{delta}} vs 前一日",
+    "liveBlock": {
+      "title": "目前 5 小時計費區塊",
+      "remaining": "剩餘約 {{minutes}} 分鐘",
+      "spent": "已花 {{amount}}",
+      "projected": "預估總額 {{amount}}"
+    }
+  },
+  "filter": {
+    "presets": {
+      "last7d": "近 7 日",
+      "last30d": "近 30 日",
+      "last90d": "近 90 日",
+      "all": "全部"
+    }
+  },
+  "overview": {
+    "sections": {
+      "cost": "成本",
+      "usageComposition": "用量組成"
+    }
+  },
+  "analysis": {
+    "sections": {
+      "projectAndTime": "專案與時段",
+      "efficiencyAndDistribution": "效率與分布"
+    }
+  },
+  "agentShare": {
+    "title": "Claude vs Codex（各 agent 成本佔比）"
+  },
+  "cacheTrend": {
+    "title": "Cache 命中率趨勢",
+    "series": "Cache 命中率"
+  },
+  "costByTokenType": {
+    "title": "花費組成",
+    "subtitle": "你的錢花在哪種 token · 對比用量看出「量大不等於錢多」",
+    "footnote": "$ 拆分為估計：依 LiteLLM 各類型牌價比例分攤，總額仍等於 ccusage 實際花費 · Cache 讀取＝重複讀取既有上下文（量大但單價低）· 定價更新於 {{date}}",
+    "rows": {
+      "usage": "用量",
+      "cost": "花費"
+    },
+    "series": {
+      "cacheCreation": "Cache 建立",
+      "cacheRead": "Cache 讀取"
+    }
+  },
+  "dailyCost": {
+    "title": "每日成本",
+    "series": "每日成本"
+  },
+  "hourHeatmap": {
+    "title": "開發時段熱力圖",
+    "subtitle": "本地時間",
+    "weekdays": ["週日", "週一", "週二", "週三", "週四", "週五", "週六"],
+    "tooltip": {
+      "shareOfTotal": "{{cost}} · 佔總花費 {{share}}%",
+      "daysActive": "共 {{days}} 天有活動",
+      "recentDate": "· 最近 {{date}}"
+    }
+  },
+  "modelEfficiency": {
+    "title": "模型成本效率",
+    "subtitle": "各模型的官方定價，數字越高越貴；滑過任一列，看你實際的平均花費",
+    "noPricingData": "尚無公開定價資料",
+    "footnote": "list 定價來源 LiteLLM · 更新於 {{date}}",
+    "unpriced": "　·　無公開定價：{{models}}",
+    "tooltip": {
+      "listPrice": "官方 output 牌價 {{rate}}/1M{{estimated}}",
+      "estimatedSuffix": "（估計）",
+      "effectiveRate": "實付均價 {{rate}}/1M token（含全部 token）",
+      "outputShare": "output token 佔用量 {{pct}}%"
+    }
+  },
+  "modelTimeline": {
+    "title": "Model 使用時間軸",
+    "other": "其他"
+  },
+  "projectRanking": {
+    "title": "專案花費排行",
+    "subtitle": "需 JSONL 才能歸屬到專案"
+  },
+  "projection": {
+    "title": "成本預測",
+    "monthEnd": "本月線性推估至月底",
+    "blockProjection": "目前 5h 區塊預估 {{amount}}"
+  },
+  "sessionDist": {
+    "title": "Session 上下文分布",
+    "subtitle": "每個 session 的總 token 量",
+    "tooltip": {
+      "sessionCount": "{{n}} 個 session"
+    }
+  },
+  "tokenComposition": {
+    "title": "Token 組成",
+    "toggleAbsolute": "量",
+    "toggleNormalized": "%",
+    "series": {
+      "cacheCreation": "Cache 建立",
+      "cacheRead": "Cache 讀取"
+    }
+  },
+  "whyToday": {
+    "title": "今天為什麼花這麼多",
+    "subtitle": "今日 vs 近 7 日均，依模型拆解",
+    "vsAvg": "vs 近 7 日均",
+    "flat": "今日與近期持平"
+  }
+}
