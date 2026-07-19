@@ -75,7 +75,9 @@ function percentile(sorted: number[], p: number): number {
 }
 
 export function sessionDistribution(n: CcusageNormalized) {
-  const totals = n.session.map((s) => s.totalTokens)
+  // Drop 0-token sessions: they carry no context signal and only pile up in
+  // bin 0, drowning the real distribution. Excluded from percentiles too.
+  const totals = n.session.map((s) => s.totalTokens).filter((t) => t > 0)
   const sorted = [...totals].sort((a, b) => a - b)
   return { totals, p50: percentile(sorted, 50), p90: percentile(sorted, 90) }
 }

@@ -35,7 +35,9 @@ export const useDataStore = create<DataState>()(
       // v1: initial. v2: modelEfficiency gained costPerMillionToken + outputShare.
       // v3: added costByTokenType.
       // v4: hourHeatmap cells gained days + lastDate.
-      version: 4,
+      // v5: sessionDistribution now excludes 0-token sessions (values changed,
+      //     shape same) — bump to discard stale blobs holding the old totals.
+      version: 5,
     },
   ),
 )

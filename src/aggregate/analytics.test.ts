@@ -74,6 +74,19 @@ test('sessionDistribution returns totals + percentiles', () => {
   expect(d.p90).toBe(10600)
 })
 
+test('sessionDistribution drops 0-token sessions from totals + percentiles', () => {
+  const row = (totalTokens: number) => ({
+    period: 's', agent: 'claude' as const, inputTokens: 0, outputTokens: 0,
+    cacheCreationTokens: 0, cacheReadTokens: 0, totalTokens, totalCost: 0,
+    modelBreakdowns: [], modelsUsed: [],
+  })
+  const d = sessionDistribution({
+    daily: [], weekly: [], monthly: [], blocks: [],
+    session: [row(0), row(100), row(0), row(300)],
+  })
+  expect(d.totals).toEqual([100, 300]) // zeros gone, order preserved
+})
+
 import { hourHeatmap as hm } from './analytics'
 test('hourHeatmap shifts to local time by tzOffsetMinutes', () => {
   // event at 2026-07-10T23:30Z; tzOffset -480 (UTC+8) → local 07:31 Fri... compute:

@@ -3,10 +3,21 @@ import { buildSessionDistOption, bucketize } from './sessionDistOption'
 const theme = { theme: 'light' as const, ink: '#111', muted: '#666', grid: '#eee', surface: '#fff' }
 const labels = { tooltip: { sessionCount: 'TEST_SESSIONS n={{n}}' } }
 
-test('bucketize splits totals into N ascending bins', () => {
-  const b = bucketize([0, 10, 20, 30, 40], 5)
-  expect(b).toHaveLength(5)
+test('bucketize returns normalBins + 1 overflow bin, counting every total', () => {
+  const b = bucketize([0, 10, 20, 30, 40], 4, 40)
+  expect(b).toHaveLength(5) // 4 normal + 1 overflow
   expect(b.reduce((a, x) => a + x.count, 0)).toBe(5)
+})
+
+test('bucketize routes totals >= cap into the overflow bin', () => {
+  // cap = 100, width = 100/5 = 20 → normal bins [0,20,40,60,80], overflow >=100
+  const b = bucketize([0, 25, 50, 500, 999], 5, 100)
+  const overflow = b[b.length - 1]
+  expect(overflow.overflow).toBe(true)
+  expect(overflow.count).toBe(2) // 500 and 999
+  expect(overflow.label).toBe('>100')
+  // the 3 in-range totals sit in normal bins
+  expect(b.slice(0, 5).reduce((a, x) => a + x.count, 0)).toBe(3)
 })
 
 test('option is a single-hue bar histogram with a P90 markLine', () => {
@@ -17,16 +28,15 @@ test('option is a single-hue bar histogram with a P90 markLine', () => {
   expect(opt.legend).toBeUndefined()
 })
 
-test('P90 markLine lands in the same bucket bucketize assigns p90', () => {
-  const totals = [0, 20, 40, 60, 80, 100]
-  const p90 = 90
+test('P90 markLine lands in the last normal bin (cap = P90), never the overflow bin', () => {
+  const totals = [0, 20, 40, 60, 80, 90, 5000]
+  const p90 = 90 // cap; the 5000 outlier is isolated into overflow
   const opt: any = buildSessionDistOption({ totals, p50: 50, p90 }, theme, labels)
   const markBin = opt.series[0].markLine.data[0].xAxis
-  // bucketize width = max(100)/12, floor(90/width)
-  const width = 100 / 12
-  expect(markBin).toBe(Math.min(11, Math.floor(90 / width)))
-  // and it is NOT the Math.round value when they differ
-  expect(markBin).toBe(Math.floor((p90 / 100) * 12))
+  // buckets = N normal + 1 overflow; markLine clamps to the last normal bin,
+  // i.e. index (data.length - 2), never the trailing overflow bin.
+  const lastNormalBin = opt.xAxis.data.length - 2
+  expect(markBin).toBe(lastNormalBin)
 })
 
 test('tooltip valueFormatter fills the session count template from labels', () => {
