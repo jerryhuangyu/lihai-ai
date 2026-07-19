@@ -1,7 +1,7 @@
 {
   "_source": "litellm",
   "_url": "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
-  "_fetchedAt": "2026-07-12",
+  "_fetchedAt": "2026-07-19",
   "_note": "per-token-type list price in USD per 1M tokens (o=output, i=input, cr=cache-read, cc=cache-creation); refresh via scripts/update-prices.mjs",
   "families": {
     "opus": {
@@ -2382,6 +2382,12 @@
       "cr": 0.15,
       "cc": 0
     },
+    "gemini/gemini-omni-flash-preview": {
+      "o": 9,
+      "i": 1.5,
+      "cr": 0,
+      "cc": 0
+    },
     "gemini/gemini-3.1-pro-preview": {
       "o": 12,
       "i": 2,
@@ -2398,6 +2404,12 @@
       "o": 3,
       "i": 0.5,
       "cr": 0.05,
+      "cc": 0
+    },
+    "gemini-omni-flash-preview": {
+      "o": 9,
+      "i": 1.5,
+      "cr": 0,
       "cc": 0
     },
     "gemini-3.5-flash": {
@@ -4469,6 +4481,24 @@
       "i": 0.08,
       "cr": 0,
       "cc": 0
+    },
+    "bedrock_mantle/openai.gpt-5.6-sol": {
+      "o": 33,
+      "i": 5.5,
+      "cr": 0.55,
+      "cc": 6.88
+    },
+    "bedrock_mantle/openai.gpt-5.6-terra": {
+      "o": 16.5,
+      "i": 2.75,
+      "cr": 0.28,
+      "cc": 3.44
+    },
+    "bedrock_mantle/openai.gpt-5.6-luna": {
+      "o": 6.6,
+      "i": 1.1,
+      "cr": 0.11,
+      "cc": 1.38
     },
     "bedrock_mantle/openai.gpt-5.5": {
       "o": 33,
