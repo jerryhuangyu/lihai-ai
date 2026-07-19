@@ -6,7 +6,6 @@ import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ImportPanel } from '@/features/import/ImportPanel'
-import { FilterBar } from '@/features/filter/FilterBar'
 import { useHasData } from '@/ui/selectors'
 import { useDataStore } from '@/store/useDataStore'
 
@@ -36,12 +35,9 @@ export function RootContent() {
           {t('root.costCoverage', { pct: covPct })}
           {generatedAt && ` · ${t('root.exportedAt', { date: new Date(generatedAt).toLocaleString() })}`}
         </span>
-        <div className="flex items-center gap-3">
-          <FilterBar />
-          <button className="hover:text-foreground underline" onClick={reset}>
-            {t('root.reimport')}
-          </button>
-        </div>
+        <button type="button" className="hover:text-foreground underline" onClick={reset}>
+          {t('root.reimport')}
+        </button>
       </div>
       <Outlet />
     </div>

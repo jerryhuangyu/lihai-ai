@@ -38,33 +38,7 @@ export function monthEndProjection(n: CcusageNormalized, todayIso: string): numb
   return perDay * daysInMonth
 }
 
-export function whyToday(n: CcusageNormalized, todayIso: string) {
-  const d = sortedDaily(n)
-  const today = d.find((r) => r.period === todayIso)
-  const prior = d.filter((r) => r.period < todayIso).slice(-7)
-  const avg = prior.length ? prior.reduce((a, r) => a + r.totalCost, 0) / prior.length : 0
-  const delta = (today?.totalCost ?? 0) - avg
-
-  // per-model today vs per-model trailing avg
-  const todayByModel = new Map<string, number>()
-  for (const b of today?.modelBreakdowns ?? []) {
-    todayByModel.set(b.modelName, (todayByModel.get(b.modelName) ?? 0) + b.cost)
-  }
-  const priorSumByModel = new Map<string, number>()
-  for (const r of prior) {
-    for (const b of r.modelBreakdowns) {
-      priorSumByModel.set(b.modelName, (priorSumByModel.get(b.modelName) ?? 0) + b.cost)
-    }
-  }
-  const models = new Set([...todayByModel.keys(), ...priorSumByModel.keys()])
-  const byModel = [...models]
-    .map((model) => ({
-      model,
-      delta:
-        (todayByModel.get(model) ?? 0) -
-        (prior.length ? (priorSumByModel.get(model) ?? 0) / prior.length : 0),
-    }))
-    .sort((a, b) => b.delta - a.delta)
-
-  return { delta, byModel }
-}
+// whyToday moved to aggregate/modelDaily.ts (whyTodayFromDaily): it now takes a
+// selected date range as the comparison window (today vs the range's daily
+// average) so the card responds to the 7d/30d/90d/all filter, instead of a
+// fixed trailing-7-day baseline.

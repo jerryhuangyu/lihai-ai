@@ -8,6 +8,14 @@ export function tokensCompact(n: number): string {
   return String(n)
 }
 
+export function durationCompact(ms: number): string {
+  const s = ms / 1000
+  if (s < 60) return `${Math.round(s)}s`
+  const m = s / 60
+  if (m < 60) return `${Math.round(m)}m`
+  return `${(m / 60).toFixed(1)}h`
+}
+
 export function pct(ratio: number, digits = 1): string {
   return `${(ratio * 100).toFixed(digits)}%`
 }

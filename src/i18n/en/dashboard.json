@@ -8,6 +8,8 @@
     "totalCost": { "label": "Total cost" },
     "avgPerDay": { "label": "Avg cost per day" },
     "burnRate": { "label": "Burn rate (per hour)" },
+    "totalTypedPrompts": { "label": "Total typed prompts" },
+    "avgTypedPrompts": { "label": "Avg typed / session" },
     "deltaVsYesterday": "{{delta}} vs yesterday",
     "liveBlock": {
       "title": "Current 5-hour billing block",
@@ -26,6 +28,7 @@
   },
   "overview": {
     "sections": {
+      "liveStatus": "Live status",
       "cost": "Cost",
       "usageComposition": "Usage composition"
     }
@@ -92,9 +95,7 @@
     "subtitle": "Requires JSONL to attribute cost to projects"
   },
   "projection": {
-    "title": "Cost projection",
-    "monthEnd": "Linear projection to month end",
-    "blockProjection": "Current 5h block projected {{amount}}"
+    "monthEndStat": { "label": "Projected month-end cost" }
   },
   "sessionDist": {
     "title": "Session context distribution",
@@ -112,6 +113,36 @@
     "window200k": "200K window",
     "window1m": "1M window"
   },
+  "sessionScale": {
+    "title": "Session scale",
+    "subtitle": "Duration vs typed prompts (one dot per session)",
+    "xAxisName": "Duration (min)",
+    "yAxisName": "Typed prompts",
+    "tooltip": "{{prompts}} typed · {{duration}}"
+  },
+  "cadence": {
+    "title": "Iteration cadence",
+    "subtitle": "Time between consecutive turns",
+    "tooltip": {
+      "count": "{{n}}x"
+    }
+  },
+  "promptDist": {
+    "title": "Prompts per session",
+    "subtitle": "Human typed vs all prompts (incl. programmatic)",
+    "seriesTyped": "Typed",
+    "seriesAll": "All",
+    "tooltip": {
+      "count": "{{n}} session(s)"
+    }
+  },
+  "agenticDepth": {
+    "title": "Agentic depth",
+    "subtitle": "Model requests per typed prompt (turns ÷ typed)",
+    "tooltip": {
+      "count": "{{n}} session(s)"
+    }
+  },
   "tokenComposition": {
     "title": "Token composition",
     "toggleAbsolute": "Qty",
@@ -123,8 +154,8 @@
   },
   "whyToday": {
     "title": "Why did today cost so much",
-    "subtitle": "Today vs 7-day average, broken down by model",
-    "vsAvg": "vs 7-day average",
-    "flat": "Today is in line with recent days"
+    "subtitle": "Latest day vs the selected range's daily average, by model",
+    "vsAvg": "vs selected-range daily average",
+    "flat": "Today is in line with the selected range"
   }
 }

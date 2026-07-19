@@ -8,9 +8,14 @@
   "detail": {
     "loading": "載入中…",
     "messageCount": "{{count}} 則訊息",
+    "prompts": "打字 {{typed}} · 全部 {{all}} prompt",
     "cost": "成本 {{amount}}",
     "tokens": "{{tokens}} tokens",
     "timeline": {
+      "xAxisName": "訊息序"
+    },
+    "contextCurve": {
+      "title": "上下文成長曲線",
       "xAxisName": "訊息序"
     }
   }

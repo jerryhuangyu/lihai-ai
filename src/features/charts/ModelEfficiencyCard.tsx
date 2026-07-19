@@ -5,15 +5,19 @@ import { EChart } from '../../viz/EChart'
 import { Card } from '../../ui/Card'
 import { EmptyState } from '../../ui/EmptyState'
 import { outputRate, PRICING_META } from '../../pricing/outputRate'
+import { useResolvedRange } from '../filter/FilterBar'
+import { sliceByDate } from '../filter/slice'
+import { modelEfficiencyFromDaily } from '../../aggregate/modelDaily'
 import { buildModelEfficiencyOption, type EfficiencyRow } from './modelEfficiencyOption'
 
 export function ModelEfficiencyCard() {
   const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
+  const range = useResolvedRange()
   if (!agg) return null
 
-  const enriched = agg.modelEfficiency.map((m) => {
+  const enriched = modelEfficiencyFromDaily(sliceByDate(agg.modelDaily, range)).map((m) => {
     const { rate, exact } = outputRate(m.model)
     return {
       model: m.model,

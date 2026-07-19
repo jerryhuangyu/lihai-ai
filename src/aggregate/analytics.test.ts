@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import {
-  projectRanking, hourHeatmap, agentShare, modelEfficiency, sessionDistribution,
-  costByTokenType, sessionContextPeak,
+  projectRanking, hourHeatmap, sessionMeta, agentShareFrom, sessionDistributionFrom,
+  costByTokenType, costByTokenTypeDaily, sumCostByTokenType, sessionContextPeak,
 } from './analytics'
 import { normalizeCcusage } from '../parsers/ccusage'
 import { toMessageEvents } from '../parsers/events'
@@ -56,34 +56,42 @@ test('agentShare groups ccusage session rows by agent (not daily, which is alway
     session: [mkSession('s1', 'claude', 3.0), mkSession('s2', 'codex', 2.0), mkSession('s3', 'claude', 1.0)],
     blocks: [],
   }
-  const r = agentShare(n)
+  const r = agentShareFrom(sessionMeta(n))
   expect(r).toEqual([{ agent: 'claude', cost: 4.0 }, { agent: 'codex', cost: 2.0 }])
 })
 
-test('modelEfficiency computes $/1M output', () => {
-  const e = modelEfficiency(n)[0]
-  expect(e.model).toBe('claude-opus-4-8')
-  expect(e.costPerMillionOutput).toBeCloseTo((3.0 / 2000) * 1e6, 6)
-  expect(e.costPerMillionToken).toBeCloseTo((3.0 / 10600) * 1e6, 6)
-  expect(e.outputShare).toBeCloseTo(2000 / 10600, 6)
+test('sessionMeta anchors each session to its lastActivity day (sentinel when absent)', () => {
+  const base = {
+    agent: 'claude' as const, inputTokens: 0, outputTokens: 0, cacheCreationTokens: 0,
+    cacheReadTokens: 0, totalTokens: 10, totalCost: 1, modelBreakdowns: [], modelsUsed: [],
+  }
+  const rows = sessionMeta({
+    daily: [], weekly: [], monthly: [], blocks: [],
+    session: [
+      { period: 's1', lastActivity: '2026-07-10T14:00:00.000Z', ...base },
+      { period: 's2', ...base }, // no lastActivity → far-past sentinel
+    ],
+  })
+  expect(rows[0].date).toBe('2026-07-10')
+  expect(rows[1].date).toBe('0001-01-01')
 })
 
-test('sessionDistribution returns totals + percentiles', () => {
-  const d = sessionDistribution(n)
+test('sessionDistributionFrom returns totals + percentiles', () => {
+  const d = sessionDistributionFrom(sessionMeta(n))
   expect(d.totals).toEqual([10600])
   expect(d.p90).toBe(10600)
 })
 
-test('sessionDistribution drops 0-token sessions from totals + percentiles', () => {
+test('sessionDistributionFrom drops 0-token sessions from totals + percentiles', () => {
   const row = (totalTokens: number) => ({
     period: 's', agent: 'claude' as const, inputTokens: 0, outputTokens: 0,
     cacheCreationTokens: 0, cacheReadTokens: 0, totalTokens, totalCost: 0,
     modelBreakdowns: [], modelsUsed: [],
   })
-  const d = sessionDistribution({
+  const d = sessionDistributionFrom(sessionMeta({
     daily: [], weekly: [], monthly: [], blocks: [],
     session: [row(0), row(100), row(0), row(300)],
-  })
+  }))
   expect(d.totals).toEqual([100, 300]) // zeros gone, order preserved
 })
 
@@ -166,4 +174,25 @@ test('costByTokenType: raw token volume accumulates across events regardless of 
   expect(r.cacheRead.tokens).toBe(50)
   expect(r.input.tokens).toBe(5)
   expect(r.cacheCreation.tokens).toBe(0)
+})
+
+test('costByTokenTypeDaily groups by date (sorted); sum equals the whole-set split', () => {
+  const day = (ts: string, cost: number): CostedEvent => ({
+    ...mkCosted('claude-opus-4-8', { output: 1000, input: 1000 }, cost), ts,
+  })
+  const events = [
+    day('2026-07-11T09:00:00.000Z', 4),
+    day('2026-07-10T13:00:00.000Z', 10),
+    day('2026-07-10T14:00:00.000Z', 6),
+  ]
+  const daily = costByTokenTypeDaily(events)
+  expect(daily.map((r) => r.date)).toEqual(['2026-07-10', '2026-07-11']) // sorted, deduped
+  // sum of daily rows === full-set costByTokenType (allocation is per-event, so
+  // grouping by date before summing is exact)
+  const whole = costByTokenType(events)
+  const summed = sumCostByTokenType(daily)
+  for (const k of ['output', 'cacheCreation', 'cacheRead', 'input'] as const) {
+    expect(summed[k].cost).toBeCloseTo(whole[k].cost, 6)
+    expect(summed[k].tokens).toBe(whole[k].tokens)
+  }
 })

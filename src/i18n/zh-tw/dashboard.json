@@ -8,6 +8,8 @@
     "totalCost": { "label": "總花費" },
     "avgPerDay": { "label": "日均花費" },
     "burnRate": { "label": "Burn rate（每小時）" },
+    "totalTypedPrompts": { "label": "總打字次數" },
+    "avgTypedPrompts": { "label": "每 session 平均打字" },
     "deltaVsYesterday": "{{delta}} vs 前一日",
     "liveBlock": {
       "title": "目前 5 小時計費區塊",
@@ -26,6 +28,7 @@
   },
   "overview": {
     "sections": {
+      "liveStatus": "目前狀態",
       "cost": "成本",
       "usageComposition": "用量組成"
     }
@@ -92,9 +95,7 @@
     "subtitle": "需 JSONL 才能歸屬到專案"
   },
   "projection": {
-    "title": "成本預測",
-    "monthEnd": "本月線性推估至月底",
-    "blockProjection": "目前 5h 區塊預估 {{amount}}"
+    "monthEndStat": { "label": "月底預估花費" }
   },
   "sessionDist": {
     "title": "Session 上下文分布",
@@ -112,6 +113,36 @@
     "window200k": "200K 視窗",
     "window1m": "1M 視窗"
   },
+  "sessionScale": {
+    "title": "Session 規模",
+    "subtitle": "每個 session 的時長與打字次數（每點一個 session）",
+    "xAxisName": "時長 (分鐘)",
+    "yAxisName": "打字次數",
+    "tooltip": "打字 {{prompts}} 次 · {{duration}}"
+  },
+  "cadence": {
+    "title": "迭代節奏",
+    "subtitle": "相鄰 turn 的時間間隔分布",
+    "tooltip": {
+      "count": "{{n}} 次"
+    }
+  },
+  "promptDist": {
+    "title": "每 session 的 prompt 數",
+    "subtitle": "使用者實際打字 vs 全部 prompt（含程式送入）",
+    "seriesTyped": "打字",
+    "seriesAll": "全部",
+    "tooltip": {
+      "count": "{{n}} 個 session"
+    }
+  },
+  "agenticDepth": {
+    "title": "Agentic 深度",
+    "subtitle": "每次打字觸發幾個 model 請求（turns ÷ 打字）",
+    "tooltip": {
+      "count": "{{n}} 個 session"
+    }
+  },
   "tokenComposition": {
     "title": "Token 組成",
     "toggleAbsolute": "量",
@@ -123,8 +154,8 @@
   },
   "whyToday": {
     "title": "今天為什麼花這麼多",
-    "subtitle": "今日 vs 近 7 日均，依模型拆解",
-    "vsAvg": "vs 近 7 日均",
-    "flat": "今日與近期持平"
+    "subtitle": "最新一日 vs 所選範圍日均，依模型拆解",
+    "vsAvg": "vs 所選範圍日均",
+    "flat": "今日與所選範圍持平"
   }
 }

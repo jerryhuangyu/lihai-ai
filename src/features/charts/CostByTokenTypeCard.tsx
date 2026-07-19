@@ -5,16 +5,20 @@ import { EChart } from '../../viz/EChart'
 import { Card } from '../../ui/Card'
 import { EmptyState } from '../../ui/EmptyState'
 import { PRICING_META } from '../../pricing/outputRate'
+import { useResolvedRange } from '../filter/FilterBar'
+import { sliceByDate } from '../filter/slice'
+import { sumCostByTokenType } from '../../aggregate/analytics'
 import { buildCostByTokenTypeOption } from './costByTokenTypeOption'
 
 export function CostByTokenTypeCard() {
   const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
+  const range = useResolvedRange()
   if (!agg) return null
 
-  const d = agg.costByTokenType
-  const hasData = d && (d.output.cost > 0 || d.cacheCreation.cost > 0 || d.cacheRead.cost > 0 || d.input.cost > 0)
+  const d = sumCostByTokenType(sliceByDate(agg.costByTokenTypeDaily, range))
+  const hasData = d.output.cost > 0 || d.cacheCreation.cost > 0 || d.cacheRead.cost > 0 || d.input.cost > 0
 
   return (
     <Card title={t('costByTokenType.title')} subtitle={t('costByTokenType.subtitle')}>

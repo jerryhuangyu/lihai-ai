@@ -9,7 +9,7 @@ function gz(obj: unknown): Uint8Array {
 
 test('parses a valid gzipped bundle', () => {
   const out = parseBundle(gz(SAMPLE_BUNDLE))
-  expect(out.v).toBe(1)
+  expect(out.v).toBe(2)
   expect(out.sessions).toHaveLength(1)
 })
 
@@ -22,6 +22,6 @@ test('throws BundleError on wrong version', () => {
 })
 
 test('throws BundleError when sessions missing', () => {
-  const bad = { v: 1, generatedAt: 'x', ccusage: {} }
+  const bad = { v: 2, generatedAt: 'x', ccusage: {} }
   expect(() => parseBundle(gz(bad))).toThrow(BundleError)
 })

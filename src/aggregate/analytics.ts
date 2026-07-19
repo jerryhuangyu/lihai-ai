@@ -35,38 +35,42 @@ export function hourHeatmap(costed: CostedEvent[], tzOffsetMinutes = 0) {
   })
 }
 
-// Per-agent cost comes from ccusage SESSION rows: each session carries a real
-// agent (claude/codex/gemini/...), whereas daily rows are always agent='all'.
-// Session is also the right source because it covers ALL agents' cost, while
-// JSONL-derived costed events are Claude-only.
-export function agentShare(n: CcusageNormalized) {
+export interface SessionMetaRow {
+  date: string // session's last-activity day (YYYY-MM-DD)
+  agent: string
+  totalTokens: number
+  cost: number
+}
+
+// Per-session rollup from ccusage SESSION rows, carrying each session's
+// last-activity date so agent-share and session-distribution can be sliced by
+// the date-range filter. Session rows are the right source for both: they cover
+// ALL agents' cost (claude/codex/gemini/...), whereas daily rows are always
+// agent='all' and JSONL-derived costed events are Claude-only.
+//
+// A session with no derivable date gets a far-past sentinel ('0001-01-01') so
+// it still appears in the unfiltered 'all' view (preserving prior totals) but
+// falls outside every real preset window (it can't be placed on the timeline).
+export function sessionMeta(n: CcusageNormalized): SessionMetaRow[] {
+  return n.session.map((s) => ({
+    date: s.lastActivity ? s.lastActivity.slice(0, 10) : '0001-01-01',
+    agent: s.agent,
+    totalTokens: s.totalTokens,
+    cost: s.totalCost,
+  }))
+}
+
+export function agentShareFrom(rows: SessionMetaRow[]) {
   const m = new Map<string, number>()
-  for (const s of n.session) m.set(s.agent, (m.get(s.agent) ?? 0) + s.totalCost)
+  for (const s of rows) m.set(s.agent, (m.get(s.agent) ?? 0) + s.cost)
   return [...m.entries()]
     .map(([agent, cost]) => ({ agent, cost }))
     .sort((a, b) => b.cost - a.cost)
 }
 
-export function modelEfficiency(n: CcusageNormalized) {
-  const m = new Map<string, { cost: number; output: number; total: number }>()
-  for (const r of n.daily) {
-    for (const b of r.modelBreakdowns) {
-      const cur = m.get(b.modelName) ?? { cost: 0, output: 0, total: 0 }
-      cur.cost += b.cost
-      cur.output += b.outputTokens
-      cur.total += b.inputTokens + b.outputTokens + b.cacheCreationTokens + b.cacheReadTokens
-      m.set(b.modelName, cur)
-    }
-  }
-  return [...m.entries()]
-    .map(([model, v]) => ({
-      model,
-      costPerMillionOutput: v.output > 0 ? (v.cost / v.output) * 1e6 : 0,
-      costPerMillionToken: v.total > 0 ? (v.cost / v.total) * 1e6 : 0,
-      outputShare: v.total > 0 ? v.output / v.total : 0,
-    }))
-    .sort((a, b) => a.costPerMillionToken - b.costPerMillionToken)
-}
+// modelEfficiency moved to aggregate/modelDaily.ts (modelEfficiencyFromDaily),
+// which computes it from range-sliceable per-date rows instead of the whole
+// dataset, so the card can respond to the date-range filter.
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0
@@ -90,10 +94,10 @@ export function sessionContextPeak(costed: CostedEvent[]) {
   return { peaks }
 }
 
-export function sessionDistribution(n: CcusageNormalized) {
+export function sessionDistributionFrom(rows: SessionMetaRow[]) {
   // Drop 0-token sessions: they carry no context signal and only pile up in
   // bin 0, drowning the real distribution. Excluded from percentiles too.
-  const totals = n.session.map((s) => s.totalTokens).filter((t) => t > 0)
+  const totals = rows.map((s) => s.totalTokens).filter((t) => t > 0)
   const sorted = [...totals].sort((a, b) => a - b)
   return { totals, p50: percentile(sorted, 50), p90: percentile(sorted, 90) }
 }
@@ -142,6 +146,44 @@ export function costByTokenType(costed: CostedEvent[]): CostByTokenType {
     out.cacheCreation.tokens += t.cacheCreation
     out.cacheRead.tokens += t.cacheRead
     out.input.tokens += t.input
+  }
+  return out
+}
+
+export interface CostByTokenTypeDailyRow extends CostByTokenType {
+  date: string
+}
+
+// Per-date cost split, so the card can slice by date range then sum. Summing
+// per-date splits is EXACT vs a full-range recompute: each split is a per-event
+// dollar allocation, and grouping those allocations by date before summing
+// changes nothing. Persisting this (vs recomputing from IndexedDB) keeps the
+// card's slice synchronous, matching dailyCost.
+export function costByTokenTypeDaily(costed: CostedEvent[]): CostByTokenTypeDailyRow[] {
+  const byDate = new Map<string, CostedEvent[]>()
+  for (const e of costed) {
+    const d = e.ts.slice(0, 10)
+    const arr = byDate.get(d)
+    if (arr) arr.push(e)
+    else byDate.set(d, [e])
+  }
+  return [...byDate.entries()]
+    .map(([date, events]) => ({ date, ...costByTokenType(events) }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+export function sumCostByTokenType(rows: CostByTokenType[]): CostByTokenType {
+  const out: CostByTokenType = {
+    output: { cost: 0, tokens: 0 },
+    cacheCreation: { cost: 0, tokens: 0 },
+    cacheRead: { cost: 0, tokens: 0 },
+    input: { cost: 0, tokens: 0 },
+  }
+  for (const r of rows) {
+    for (const k of ['output', 'cacheCreation', 'cacheRead', 'input'] as const) {
+      out[k].cost += r[k].cost
+      out[k].tokens += r[k].tokens
+    }
   }
   return out
 }

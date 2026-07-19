@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { kpis, activeBlock, monthEndProjection, whyToday } from './kpi'
+import { kpis, activeBlock, monthEndProjection } from './kpi'
 import type { CcusageNormalized } from '../domain/types'
 
 function mk(dailyRows: Array<{ date: string; cost: number; model?: string }>): CcusageNormalized {
@@ -31,15 +31,4 @@ test('monthEndProjection extrapolates linearly', () => {
   // 2 days into month, $20 total -> $10/day -> 31-day month => $310
   const n = mk([{ date: '2026-07-01', cost: 10 }, { date: '2026-07-02', cost: 10 }])
   expect(monthEndProjection(n, '2026-07-02')).toBeCloseTo(310, 6)
-})
-
-test('whyToday decomposes delta by model vs trailing avg', () => {
-  const n = mk([
-    { date: '2026-07-03', cost: 10, model: 'a' },
-    { date: '2026-07-04', cost: 10, model: 'a' },
-    { date: '2026-07-05', cost: 30, model: 'a' },
-  ])
-  const w = whyToday(n, '2026-07-05')
-  expect(w.delta).toBeCloseTo(20, 6) // 30 vs avg 10
-  expect(w.byModel[0]).toEqual({ model: 'a', delta: 20 })
 })

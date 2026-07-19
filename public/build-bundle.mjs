@@ -22,9 +22,28 @@ function walk(dir) {
   return files
 }
 
+// A real user prompt: a user-role line that isn't an auto-injected tool result,
+// meta reminder, compaction summary, or subagent (sidechain) message. content is
+// either a plain string or blocks that include human text/image (tool_result
+// blocks are excluded). typed = human keyboard input: everything real except
+// prompts submitted programmatically (promptSource === 'sdk'); logs predating
+// the promptSource field are treated as typed.
+function classifyPrompt(o) {
+  if (o.type !== 'user' || o.message?.role !== 'user') return null
+  if (o.isMeta === true || o.isSidechain === true || o.isCompactSummary === true) return null
+  const c = o.message.content
+  const isPrompt = typeof c === 'string'
+    ? true
+    : Array.isArray(c) && c.some((b) => b.type === 'text' || b.type === 'image')
+  if (!isPrompt) return null
+  return { typed: o.promptSource !== 'sdk' }
+}
+
 function parseSession(file) {
   const events = []
   let sessionId, project, gitBranch
+  let typedPrompts = 0
+  let allPrompts = 0
   for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
     if (!line.trim()) continue
     let o
@@ -32,6 +51,11 @@ function parseSession(file) {
     sessionId ??= o.sessionId
     project ??= o.cwd
     gitBranch ??= o.gitBranch
+    const prompt = classifyPrompt(o)
+    if (prompt) {
+      allPrompts++
+      if (prompt.typed) typedPrompts++
+    }
     const u = o.message?.usage
     if (u && o.message?.model) {
       events.push({
@@ -47,14 +71,14 @@ function parseSession(file) {
     }
   }
   if (!sessionId || events.length === 0) return null
-  return { sessionId, project: project ?? 'unknown', gitBranch, events }
+  return { sessionId, project: project ?? 'unknown', gitBranch, events, typedPrompts, allPrompts }
 }
 
 const projectsDir = join(homedir(), '.claude', 'projects')
 const sessions = walk(projectsDir).map(parseSession).filter(Boolean)
 
 const bundle = {
-  v: 1,
+  v: 2,
   generatedAt: new Date().toISOString(),
   ccusage: {
     daily: ccusage('daily'),

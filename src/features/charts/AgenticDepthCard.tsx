@@ -3,40 +3,39 @@ import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { useRawEvents } from '../../insights/useRawEvents'
 import { eventsInRange } from '../../insights/rangeFilter'
-import { sessionContextPeak } from '../../aggregate/analytics'
+import { sessionSpans } from '../../insights/spans'
+import { joinSessionMetrics, turnsPerPrompt } from '../../insights/sessionMetrics'
 import { useChartTheme } from '../../viz/theme'
 import { EChart } from '../../viz/EChart'
 import { Card } from '../../ui/Card'
 import { EmptyState } from '../../ui/EmptyState'
 import { useResolvedRange } from '../filter/FilterBar'
-import { buildSessionContextOption } from './sessionContextOption'
+import { buildAgenticDepthOption } from './agenticDepthOption'
 
-export function SessionContextCard() {
+export function AgenticDepthCard() {
   const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const { events, loading } = useRawEvents()
   const theme = useChartTheme()
   const { from, to } = useResolvedRange()
-  // Recomputed from raw events (Claude-only, per-request context) filtered to
-  // the range's sessions, so it responds to the date filter. Was persisted;
-  // now on-demand like the other event-derived cards on this page.
-  const peak = useMemo(
-    () => sessionContextPeak(eventsInRange(events, { from, to })),
-    [events, from, to],
+  const ratios = useMemo(
+    () =>
+      turnsPerPrompt(
+        joinSessionMetrics(sessionSpans(eventsInRange(events, { from, to })), agg?.promptStats ?? []),
+      ),
+    [events, from, to, agg],
   )
   if (!agg) return null
   return (
-    <Card title={t('sessionContext.title')} subtitle={t('sessionContext.subtitle')}>
+    <Card title={t('agenticDepth.title')} subtitle={t('agenticDepth.subtitle')}>
       {loading ? (
         <EmptyState>{t('common.loading')}</EmptyState>
-      ) : peak.peaks.length === 0 ? (
+      ) : ratios.length === 0 ? (
         <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
         <EChart
-          option={buildSessionContextOption(peak, theme, {
-            tooltip: { sessionCount: t('sessionContext.tooltip.sessionCount') },
-            window200k: t('sessionContext.window200k'),
-            window1m: t('sessionContext.window1m'),
+          option={buildAgenticDepthOption(ratios, theme, {
+            tooltip: { count: t('agenticDepth.tooltip.count') },
           })}
           style={{ height: 300 }}
         />

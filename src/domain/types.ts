@@ -82,6 +82,11 @@ export interface BundleSession {
   gitBranch?: string
   agent?: Agent
   events: RawEvent[]
+  // v2+ : user-prompt counts. all = every real prompt (any source); typed =
+  // human keyboard input only (excludes programmatic promptSource === 'sdk').
+  // Optional so a malformed bundle degrades to 0 rather than crashing.
+  typedPrompts?: number
+  allPrompts?: number
 }
 
 /** raw ccusage command outputs, as embedded in the bundle */

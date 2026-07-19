@@ -1,7 +1,7 @@
 import type { Bundle } from '../types'
 
 export const SAMPLE_BUNDLE: Bundle = {
-  v: 1,
+  v: 2,
   generatedAt: '2026-07-11T00:00:00.000Z',
   ccusage: {
     daily: {
@@ -89,6 +89,8 @@ export const SAMPLE_BUNDLE: Bundle = {
       project: '/Users/dev/code/app',
       gitBranch: 'main',
       agent: 'claude',
+      typedPrompts: 2,
+      allPrompts: 3,
       events: [
         {
           ts: '2026-07-10T13:00:00.000Z',

@@ -6,24 +6,25 @@ import { Card } from '../../ui/Card'
 import { EmptyState } from '../../ui/EmptyState'
 import { useResolvedRange } from '../filter/FilterBar'
 import { sliceByDate } from '../filter/slice'
-import { sessionDistributionFrom } from '../../aggregate/analytics'
-import { buildSessionDistOption } from './sessionDistOption'
+import { buildPromptDistOption } from './promptDistOption'
 
-export function SessionDistCard() {
+export function PromptDistCard() {
   const { t } = useTranslation('dashboard')
   const agg = useAggregates()
   const theme = useChartTheme()
   const range = useResolvedRange()
   if (!agg) return null
-  const dist = sessionDistributionFrom(sliceByDate(agg.sessionMeta, range))
+  const data = sliceByDate(agg.promptStats, range)
   return (
-    <Card title={t('sessionDist.title')} subtitle={t('sessionDist.subtitle')}>
-      {dist.totals.length === 0 ? (
+    <Card title={t('promptDist.title')} subtitle={t('promptDist.subtitle')}>
+      {data.length === 0 ? (
         <EmptyState>{t('common.noData')}</EmptyState>
       ) : (
         <EChart
-          option={buildSessionDistOption(dist, theme, {
-            tooltip: { sessionCount: t('sessionDist.tooltip.sessionCount') },
+          option={buildPromptDistOption(data, theme, {
+            seriesTyped: t('promptDist.seriesTyped'),
+            seriesAll: t('promptDist.seriesAll'),
+            tooltip: { count: t('promptDist.tooltip.count') },
           })}
           style={{ height: 300 }}
         />

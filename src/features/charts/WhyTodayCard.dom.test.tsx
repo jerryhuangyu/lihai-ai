@@ -17,5 +17,5 @@ test('renders a headline delta and per-model breakdown', () => {
   render(<WhyTodayCard />)
   expect(screen.getByText(/Why did today/)).toBeTruthy()
   // narrowed to getAllByText (subtitle + standalone label both match) per prior-task pattern.
-  expect(screen.getAllByText(/vs 7-day average/).length).toBeGreaterThan(0)
+  expect(screen.getAllByText(/vs selected-range daily average/).length).toBeGreaterThan(0)
 })

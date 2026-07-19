@@ -2,12 +2,18 @@ import { useTranslation } from 'react-i18next'
 import { useAggregates } from '../../ui/selectors'
 import { Card } from '../../ui/Card'
 import { usd } from '../../ui/format'
+import { useResolvedRange } from '../filter/FilterBar'
+import { whyTodayFromDaily, latestDate } from '../../aggregate/modelDaily'
 
 export function WhyTodayCard() {
   const { t } = useTranslation('dashboard')
   const agg = useAggregates()
+  const range = useResolvedRange()
   if (!agg) return null
-  const { delta, byModel } = agg.whyToday
+  // Anchor = latest active day in the data (not range.to, a sentinel for 'all').
+  // Baseline = the selected range's earlier days, so the comparison window
+  // follows the 7d/30d/90d/all filter.
+  const { delta, byModel } = whyTodayFromDaily(agg.modelDaily, range, latestDate(agg.modelDaily))
   const top = byModel.filter((m) => Math.abs(m.delta) > 0.005).slice(0, 5)
   const sign = delta >= 0 ? '+' : ''
   return (

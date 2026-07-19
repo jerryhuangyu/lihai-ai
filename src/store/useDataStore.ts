@@ -38,7 +38,16 @@ export const useDataStore = create<DataState>()(
       // v5: sessionDistribution now excludes 0-token sessions (values changed,
       //     shape same) — bump to discard stale blobs holding the old totals.
       // v6: added sessionContextPeak (per-session peak per-request context).
-      version: 6,
+      // v7: added promptStats (per-session typed / all user-prompt counts).
+      // v8: promptStats gained a per-session date (range-slicing the prompt KPIs).
+      // v9: replaced scalar modelEfficiency/costByTokenType/whyToday with
+      //     per-date modelDaily + costByTokenTypeDaily arrays, so the cost cards
+      //     slice by the date-range filter (whyToday now range-relative too).
+      // v10: replaced scalar sessionDistribution/agentShare with per-session
+      //      sessionMeta (dated) for range slicing; dropped persisted
+      //      sessionContextPeak (now recomputed on-demand from IndexedDB events
+      //      filtered by range).
+      version: 10,
     },
   ),
 )

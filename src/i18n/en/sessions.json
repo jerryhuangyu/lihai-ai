@@ -8,9 +8,14 @@
   "detail": {
     "loading": "Loading…",
     "messageCount": "{{count}} message(s)",
+    "prompts": "{{typed}} typed · {{all}} prompts",
     "cost": "Cost {{amount}}",
     "tokens": "{{tokens}} tokens",
     "timeline": {
+      "xAxisName": "Message sequence"
+    },
+    "contextCurve": {
+      "title": "Context growth curve",
       "xAxisName": "Message sequence"
     }
   }

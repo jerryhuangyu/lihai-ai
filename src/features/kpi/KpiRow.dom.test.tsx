@@ -13,12 +13,15 @@ beforeEach(async () => {
   await i18n.changeLanguage('en')
 })
 
-test('renders total cost, avg/day, burn labels + values', () => {
+test('renders range-scoped KPI labels + values (cost + typed prompts, no burn)', () => {
   render(<KpiRow />)
   expect(screen.getByText(/Total cost/)).toBeTruthy()
   // SAMPLE_BUNDLE has a single day, so totalCost === avgPerDay === $3.00;
   // narrowed to getAllByText (matches >1 node) instead of getByText per prior-task pattern.
   expect(screen.getAllByText('$3.00').length).toBeGreaterThan(0)
   expect(screen.getByText(/Avg cost per day/)).toBeTruthy()
-  expect(screen.getByText(/Burn/)).toBeTruthy()
+  expect(screen.getByText(/Total typed prompts/)).toBeTruthy()
+  expect(screen.getByText(/Avg typed/)).toBeTruthy()
+  // Burn rate moved to LiveStatusRow — must NOT be in the range-scoped KpiRow.
+  expect(screen.queryByText(/Burn/)).toBeNull()
 })

@@ -8,7 +8,10 @@ export class BundleError extends Error {
   }
 }
 
-const SUPPORTED_VERSION = 1
+// v2 added per-session typedPrompts / allPrompts counts (build-bundle.mjs).
+// v1 bundles lack that data, so they must be regenerated rather than partially
+// supported.
+const SUPPORTED_VERSION = 2
 
 export function parseBundle(bytes: Uint8Array): Bundle {
   let text: string
