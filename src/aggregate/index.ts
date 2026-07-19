@@ -5,7 +5,7 @@ import { allocateCost } from '../join/allocateCost'
 import { dailyCost, tokenComposition, cacheTrend, modelTimeline } from './timeseries'
 import {
   projectRanking, hourHeatmap, agentShare, modelEfficiency, sessionDistribution,
-  costByTokenType,
+  costByTokenType, sessionContextPeak,
 } from './analytics'
 import { kpis, activeBlock, monthEndProjection, whyToday } from './kpi'
 import { sessionSummaries } from './sessions'
@@ -20,6 +20,7 @@ export interface Aggregates {
   agentShare: ReturnType<typeof agentShare>
   modelEfficiency: ReturnType<typeof modelEfficiency>
   sessionDistribution: ReturnType<typeof sessionDistribution>
+  sessionContextPeak: ReturnType<typeof sessionContextPeak>
   costByTokenType: ReturnType<typeof costByTokenType>
   kpis: ReturnType<typeof kpis>
   activeBlock: ReturnType<typeof activeBlock>
@@ -47,6 +48,7 @@ export function buildAggregates(
     agentShare: agentShare(n),
     modelEfficiency: modelEfficiency(n),
     sessionDistribution: sessionDistribution(n),
+    sessionContextPeak: sessionContextPeak(costed),
     costByTokenType: costByTokenType(costed),
     kpis: kpis(n),
     activeBlock: activeBlock(n),

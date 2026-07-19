@@ -4,6 +4,7 @@ import { ProjectRankingCard } from '@/features/charts/ProjectRankingCard'
 import { HourHeatmapCard } from '@/features/charts/HourHeatmapCard'
 import { CacheTrendCard } from '@/features/charts/CacheTrendCard'
 import { SessionDistCard } from '@/features/charts/SessionDistCard'
+import { SessionContextCard } from '@/features/charts/SessionContextCard'
 import { AgentShareCard } from '@/features/charts/AgentShareCard'
 import { DashboardGrid } from '@/features/dashboard/DashboardGrid'
 
@@ -28,6 +29,7 @@ export function Analysis() {
         <DashboardGrid>
           <CacheTrendCard />
           <SessionDistCard />
+          <SessionContextCard />
           <AgentShareCard />
         </DashboardGrid>
       </div>

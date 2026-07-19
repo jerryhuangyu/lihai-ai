@@ -74,6 +74,22 @@ function percentile(sorted: number[], p: number): number {
   return sorted[Math.min(Math.max(idx, 0), sorted.length - 1)]
 }
 
+// Peak per-request context per session: for each event, the input side that
+// the model had to read that turn (input + cacheCreation + cacheRead — output
+// is generated, not part of the prompt context), then the max across the
+// session's events. This is the quantity the context window actually bounds,
+// unlike sessionDistribution's cumulative session totals. Sessions whose peak
+// is 0 (no input recorded) are dropped.
+export function sessionContextPeak(costed: CostedEvent[]) {
+  const peakBySession = new Map<string, number>()
+  for (const e of costed) {
+    const ctx = e.tokens.input + e.tokens.cacheCreation + e.tokens.cacheRead
+    peakBySession.set(e.sessionId, Math.max(peakBySession.get(e.sessionId) ?? 0, ctx))
+  }
+  const peaks = [...peakBySession.values()].filter((v) => v > 0)
+  return { peaks }
+}
+
 export function sessionDistribution(n: CcusageNormalized) {
   // Drop 0-token sessions: they carry no context signal and only pile up in
   // bin 0, drowning the real distribution. Excluded from percentiles too.

@@ -103,6 +103,15 @@
       "sessionCount": "{{n}} 個 session"
     }
   },
+  "sessionContext": {
+    "title": "Session 上下文峰值",
+    "subtitle": "每個 session 單次請求的最高上下文用量，對照 context window",
+    "tooltip": {
+      "sessionCount": "{{n}} 個 session"
+    },
+    "window200k": "200K 視窗",
+    "window1m": "1M 視窗"
+  },
   "tokenComposition": {
     "title": "Token 組成",
     "toggleAbsolute": "量",

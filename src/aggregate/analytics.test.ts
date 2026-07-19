@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import {
   projectRanking, hourHeatmap, agentShare, modelEfficiency, sessionDistribution,
-  costByTokenType,
+  costByTokenType, sessionContextPeak,
 } from './analytics'
 import { normalizeCcusage } from '../parsers/ccusage'
 import { toMessageEvents } from '../parsers/events'
@@ -85,6 +85,20 @@ test('sessionDistribution drops 0-token sessions from totals + percentiles', () 
     session: [row(0), row(100), row(0), row(300)],
   })
   expect(d.totals).toEqual([100, 300]) // zeros gone, order preserved
+})
+
+test('sessionContextPeak takes the max input-side context per session', () => {
+  const ev = (sessionId: string, input: number, cacheCreation: number, cacheRead: number, output: number) => ({
+    sessionId, project: 'p', agent: 'claude', ts: '2026-07-10T13:00:00.000Z', model: 'm',
+    tokens: { input, output, cacheCreation, cacheRead }, cost: 0,
+  })
+  const d = sessionContextPeak([
+    ev('a', 100, 0, 5000, 999), // ctx = 5100
+    ev('a', 100, 2000, 8000, 1), // ctx = 10100 (session a peak)
+    ev('b', 10, 0, 40, 0), // ctx = 50 (session b peak)
+    ev('c', 0, 0, 0, 500), // ctx = 0 → dropped (output doesn't count)
+  ])
+  expect(d.peaks.sort((x, y) => x - y)).toEqual([50, 10100])
 })
 
 import { hourHeatmap as hm } from './analytics'

@@ -103,6 +103,15 @@
       "sessionCount": "{{n}} session(s)"
     }
   },
+  "sessionContext": {
+    "title": "Session context peak",
+    "subtitle": "Highest single-request context per session, vs context window",
+    "tooltip": {
+      "sessionCount": "{{n}} session(s)"
+    },
+    "window200k": "200K window",
+    "window1m": "1M window"
+  },
   "tokenComposition": {
     "title": "Token composition",
     "toggleAbsolute": "Qty",

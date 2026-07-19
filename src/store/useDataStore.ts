@@ -37,7 +37,8 @@ export const useDataStore = create<DataState>()(
       // v4: hourHeatmap cells gained days + lastDate.
       // v5: sessionDistribution now excludes 0-token sessions (values changed,
       //     shape same) — bump to discard stale blobs holding the old totals.
-      version: 5,
+      // v6: added sessionContextPeak (per-session peak per-request context).
+      version: 6,
     },
   ),
 )
