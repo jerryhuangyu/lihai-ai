@@ -1,7 +1,7 @@
 {
   "_source": "litellm",
   "_url": "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
-  "_fetchedAt": "2026-07-19",
+  "_fetchedAt": "2026-07-20",
   "_note": "per-token-type list price in USD per 1M tokens (o=output, i=input, cr=cache-read, cc=cache-creation); refresh via scripts/update-prices.mjs",
   "families": {
     "opus": {
